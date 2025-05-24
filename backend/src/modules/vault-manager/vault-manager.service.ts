@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ContractService } from '../../common/services/contract.service';
 import { TransactionService } from '../../common/services/transaction.service';
 import { AppLoggerService } from '../../common/services/logging.service';
-import { ErrorHandlerService } from '../../common/services/error-handler.service';
+// Error handler is now implemented locally in each service
 import { PoolBalance, Pool } from './entities/vault.entity';
 import { DepositDto, WithdrawDto, AddPoolDto } from '../../common/dtos/vault.dto';
 
@@ -19,7 +19,8 @@ export class VaultManagerService implements OnModuleInit {
     private poolRepository: Repository<Pool>,
     private contractService: ContractService,
     private transactionService: TransactionService,
-    private errorHandler: ErrorHandlerService,
+    // Will be used for error handling in future implementations
+    // private errorHandler: ErrorHandlerService,
     loggerService: AppLoggerService,
   ) {
     this.logger = loggerService.createLogger(VaultManagerService.name);

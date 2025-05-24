@@ -40,6 +40,18 @@ import {
 @Controller('strategy-registry')
 export class StrategyRegistryController {
   constructor(private readonly strategyRegistryService: StrategyRegistryService) {}
+  
+  private handleError(error: unknown, errorMessage: string): never {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new HttpException(
+      {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        error: errorMessage,
+        message,
+      },
+      HttpStatus.INTERNAL_SERVER_ERROR,
+    );
+  }
 
   @Get('pools')
   @ApiOperation({ summary: 'Get all pools' })
@@ -74,14 +86,7 @@ export class StrategyRegistryController {
     try {
       return await this.strategyRegistryService.getPools(active, limit, offset);
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Failed to fetch pools',
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.handleError(error, 'Failed to fetch pools');
     }
   }
 
@@ -115,14 +120,7 @@ export class StrategyRegistryController {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Failed to fetch pool',
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.handleError(error, 'Failed to fetch pool');
     }
   }
 
@@ -146,14 +144,7 @@ export class StrategyRegistryController {
       const count = await this.strategyRegistryService.getPoolCount();
       return { count };
     } catch (error) {
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Failed to fetch pool count',
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.handleError(error, 'Failed to fetch pool count');
     }
   }
 
@@ -236,11 +227,12 @@ export class StrategyRegistryController {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to validate deposit',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -295,14 +287,7 @@ export class StrategyRegistryController {
       if (error instanceof HttpException) {
         throw error;
       }
-      throw new HttpException(
-        {
-          status: HttpStatus.INTERNAL_SERVER_ERROR,
-          error: 'Failed to fetch strategy executions',
-          message: error.message,
-        },
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      this.handleError(error, 'Failed to fetch strategy executions');
     }
   }
 
@@ -337,11 +322,12 @@ export class StrategyRegistryController {
     try {
       return await this.strategyRegistryService.addPool(dto, req.user.privateKey);
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to add pool',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -399,11 +385,12 @@ export class StrategyRegistryController {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to update pool',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -463,11 +450,12 @@ export class StrategyRegistryController {
       if (error instanceof HttpException) {
         throw error;
       }
+      const errorMessage = error instanceof Error ? error.message : String(error);
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to execute rebalance',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );

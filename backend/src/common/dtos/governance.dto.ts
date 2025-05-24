@@ -8,7 +8,7 @@ export class CreateProposalDto {
   })
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Detailed proposal description',
@@ -16,7 +16,7 @@ export class CreateProposalDto {
   })
   @IsString()
   @IsNotEmpty()
-  description: string;
+  description: string = '';
 
   @ApiProperty({
     description: 'Proposer wallet address',
@@ -24,7 +24,7 @@ export class CreateProposalDto {
   })
   @IsEthereumAddress()
   @IsNotEmpty()
-  userAddress: string;
+  userAddress: string = '';
 }
 
 export class VoteDto {
@@ -34,7 +34,7 @@ export class VoteDto {
   })
   @IsNumber()
   @Min(1)
-  proposalId: number;
+  proposalId: number = 0;
 
   @ApiProperty({
     description: 'Voter wallet address',
@@ -42,7 +42,7 @@ export class VoteDto {
   })
   @IsEthereumAddress()
   @IsNotEmpty()
-  userAddress: string;
+  userAddress: string = '';
 
   @ApiProperty({
     description: 'Voting weight (based on KNT balance)',
@@ -50,7 +50,7 @@ export class VoteDto {
   })
   @IsNumber()
   @Min(0)
-  voteWeight: number;
+  voteWeight: number = 0;
 
   @ApiProperty({
     description: 'Vote choice',
@@ -58,7 +58,7 @@ export class VoteDto {
     example: 'yes'
   })
   @IsEnum(['yes', 'no'])
-  vote: 'yes' | 'no';
+  vote: 'yes' | 'no' = 'yes';
 }
 
 export class ProposalResponseDto {
@@ -66,68 +66,68 @@ export class ProposalResponseDto {
     description: 'Proposal ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Proposal title',
     example: 'Add support for new DeFi protocol'
   })
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Detailed proposal description',
     example: 'This proposal aims to integrate XYZ protocol into Kanaka to increase yield opportunities.'
   })
-  description: string;
+  description: string = '';
 
   @ApiProperty({
     description: 'Proposer wallet address',
     example: '0x1234567890abcdef1234567890abcdef12345678'
   })
-  proposer: string;
+  proposer: string = '';
 
   @ApiProperty({
     description: 'Proposal status',
     enum: ['active', 'passed', 'rejected', 'executed'],
     example: 'active'
   })
-  status: 'active' | 'passed' | 'rejected' | 'executed';
+  status: 'active' | 'passed' | 'rejected' | 'executed' = 'active';
 
   @ApiProperty({
     description: 'Voting start time',
     example: '2025-05-23T02:10:26+05:30'
   })
-  startTime: Date;
+  startTime: Date = new Date();
 
   @ApiProperty({
     description: 'Voting end time',
     example: '2025-05-30T02:10:26+05:30'
   })
-  endTime: Date;
+  endTime: Date = new Date();
 
   @ApiProperty({
     description: 'Total yes votes',
     example: 1500.75
   })
-  yesVotes: number;
+  yesVotes: number = 0;
 
   @ApiProperty({
     description: 'Total no votes',
     example: 750.25
   })
-  noVotes: number;
+  noVotes: number = 0;
 
   @ApiProperty({
     description: 'Proposal creation timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @ApiProperty({
     description: 'Proposal last update timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }
 
 export class ProposalListResponseDto {
@@ -135,11 +135,11 @@ export class ProposalListResponseDto {
     description: 'List of proposals',
     type: [ProposalResponseDto]
   })
-  proposals: ProposalResponseDto[];
+  proposals: ProposalResponseDto[] = [];
 
   @ApiProperty({
     description: 'Total number of proposals',
     example: 10
   })
-  total: number;
+  total: number = 0;
 }

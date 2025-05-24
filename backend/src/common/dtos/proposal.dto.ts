@@ -10,7 +10,7 @@ export class CreateProposalDto {
   @IsNotEmpty()
   @MinLength(10)
   @MaxLength(2000)
-  description: string;
+  description: string = '';
 
   @ApiProperty({
     description: 'Title of the proposal',
@@ -20,7 +20,7 @@ export class CreateProposalDto {
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(100)
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Actions to be executed if the proposal passes',
@@ -58,70 +58,70 @@ export class ProposalDto {
     example: 1
   })
   @IsNumber()
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Address of the proposer',
     example: '0x1234567890abcdef1234567890abcdef12345678'
   })
   @IsEthereumAddress()
-  proposer: string;
+  proposer: string = '';
 
   @ApiProperty({
     description: 'Title of the proposal',
     example: 'Increase ETH Staking Allocation'
   })
   @IsString()
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Detailed description of the proposal',
     example: 'This proposal aims to increase the allocation to ETH staking strategies by 10%'
   })
   @IsString()
-  description: string;
+  description: string = '';
 
   @ApiProperty({
     description: 'Timestamp when voting starts',
     example: 1714503600
   })
   @IsNumber()
-  startTime: number;
+  startTime: number = 0;
 
   @ApiProperty({
     description: 'Timestamp when voting ends',
     example: 1715108400
   })
   @IsNumber()
-  endTime: number;
+  endTime: number = 0;
 
   @ApiProperty({
     description: 'Number of votes in favor',
     example: '1000000000000000000000'
   })
   @IsString()
-  forVotes: string;
+  forVotes: string = '0';
 
   @ApiProperty({
     description: 'Number of votes against',
     example: '500000000000000000000'
   })
   @IsString()
-  againstVotes: string;
+  againstVotes: string = '0';
 
   @ApiProperty({
     description: 'Whether the proposal has been executed',
     example: false
   })
   @IsBoolean()
-  executed: boolean;
+  executed: boolean = false;
 
   @ApiProperty({
     description: 'Whether the proposal has been canceled',
     example: false
   })
   @IsBoolean()
-  canceled: boolean;
+  canceled: boolean = false;
 }
 
 export class CastVoteDto {
@@ -130,7 +130,7 @@ export class CastVoteDto {
     example: true
   })
   @IsBoolean()
-  support: boolean;
+  support: boolean = false;
 
   @ApiProperty({
     description: 'Optional reason for the vote',
@@ -140,7 +140,7 @@ export class CastVoteDto {
   @IsString()
   @IsOptional()
   @MaxLength(500)
-  reason?: string;
+  reason?: string = '';
 }
 
 export class VoteResponseDto {
@@ -148,89 +148,89 @@ export class VoteResponseDto {
     description: 'Vote ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Proposal ID',
     example: 1
   })
-  proposalId: number;
+  proposalId: number = 0;
 
   @ApiProperty({
     description: 'Voter address',
     example: '0x1234567890abcdef1234567890abcdef12345678'
   })
-  voter: string;
+  voter: string = '';
 
   @ApiProperty({
     description: 'Whether the vote supports the proposal',
     example: true
   })
-  support: boolean;
+  support: boolean = false;
 
   @ApiProperty({
     description: 'Voting power used',
     example: '1000000000000000000'
   })
-  votes: string;
+  votes: string = '0';
 
   @ApiProperty({
     description: 'Reason for the vote',
     example: 'I support this proposal because it will increase yields',
     nullable: true
   })
-  reason: string | null;
+  reason: string | null = null;
 
   @ApiProperty({
     description: 'Timestamp of the vote',
     example: '2025-05-23T02:10:26+05:30'
   })
-  timestamp: Date;
+  timestamp: Date = new Date();
 }
 
 export class ProposalUpdateDto {
   @ApiProperty({ description: 'Proposal identifier' })
   @IsString()
   @IsNotEmpty()
-  proposalId: string;
+  proposalId: string = '';
 
   @ApiProperty({ description: 'Proposal title' })
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title: string = '';
 
   @ApiProperty({ description: 'Current status' })
   @IsString()
-  status: 'pending' | 'active' | 'passed' | 'rejected' | 'executed' | 'cancelled';
+  status: 'pending' | 'active' | 'passed' | 'rejected' | 'executed' | 'cancelled' = 'pending';
 
   @ApiProperty({ description: 'Total votes in favor' })
   @IsNumber()
-  votesFor: number;
+  votesFor: number = 0;
 
   @ApiProperty({ description: 'Total votes against' })
   @IsNumber()
-  votesAgainst: number;
+  votesAgainst: number = 0;
 
   @ApiProperty({ description: 'Total abstained votes' })
   @IsNumber()
-  votesAbstain: number;
+  votesAbstain: number = 0;
 
   @ApiProperty({ description: 'Quorum percentage reached' })
   @IsNumber()
-  quorumPercentage: number;
+  quorumPercentage: number = 0;
 
   @ApiProperty({ description: 'Time remaining for voting (in seconds)' })
   @IsNumber()
   @IsOptional()
-  timeRemaining?: number;
+  timeRemaining?: number = 0;
 
   @ApiProperty({ description: 'Execution status if passed' })
   @IsString()
   @IsOptional()
-  executionStatus?: 'pending' | 'in_progress' | 'completed' | 'failed';
+  executionStatus?: 'pending' | 'in_progress' | 'completed' | 'failed' = 'pending';
 
   @ApiProperty({ description: 'Last update timestamp' })
-  lastUpdated: Date;
+  lastUpdated: Date = new Date();
 
   @ApiProperty({ description: 'Recent votes' })
   @IsArray()
@@ -240,5 +240,5 @@ export class ProposalUpdateDto {
     support: 'for' | 'against' | 'abstain';
     weight: number;
     timestamp: Date;
-  }>;
+  }> = [];
 }

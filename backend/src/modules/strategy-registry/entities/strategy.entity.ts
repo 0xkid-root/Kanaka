@@ -3,44 +3,44 @@ import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } fro
 @Entity('pools')
 export class Pool {
   @PrimaryColumn()
-  poolId: string;
+  poolId: string = '';
 
   @Column()
-  token: string;
+  token: string = '';
 
   @Column()
-  strategy: string;
+  strategy: string = '';
 
   @Column({ default: true })
-  active: boolean;
+  active: boolean = true;
 
   @Column({ type: 'decimal', precision: 36, scale: 0 })
-  minDeposit: string;
+  minDeposit: string = '0';
 
   @Column({ type: 'decimal', precision: 36, scale: 0 })
-  maxCapacity: string;
+  maxCapacity: string = '0';
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }
 
 @Entity('strategy_executions')
 export class StrategyExecution {
   @PrimaryColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  poolId: string;
+  poolId: string = '';
 
   @Column()
-  strategy: string;
+  strategy: string = '';
 
   @Column({ type: 'decimal', precision: 36, scale: 0 })
-  weight: string;
+  weight: string = '0';
 
   @CreateDateColumn()
-  executedAt: Date;
+  executedAt: Date = new Date();
 }

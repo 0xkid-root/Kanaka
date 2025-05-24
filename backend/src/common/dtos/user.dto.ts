@@ -1,6 +1,54 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEthereumAddress, IsNotEmpty, IsString, IsEnum, IsOptional, IsArray } from 'class-validator';
 
+export class CreateNonceDto {
+  @ApiProperty({
+    description: 'Ethereum wallet address',
+    example: '0x1234567890abcdef1234567890abcdef12345678'
+  })
+  @IsEthereumAddress()
+  @IsNotEmpty()
+  walletAddress: string = '';
+}
+
+export class VerifySignatureDto {
+  @ApiProperty({
+    description: 'Ethereum wallet address',
+    example: '0x1234567890abcdef1234567890abcdef12345678'
+  })
+  @IsEthereumAddress()
+  @IsNotEmpty()
+  walletAddress: string = '';
+
+  @ApiProperty({
+    description: 'Signature created by signing the nonce message',
+    example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1b'
+  })
+  @IsString()
+  @IsNotEmpty()
+  signature: string = '';
+}
+
+export class UpdateProfileDto {
+  @ApiProperty({
+    description: 'Twitter ID',
+    example: 'cryptowhale',
+    required: false
+  })
+  @IsString()
+  @IsOptional()
+  twitterId?: string;
+
+  @ApiProperty({
+    description: 'Discord ID',
+    example: 'cryptowhale#1234',
+    required: false
+  })
+  @IsString()
+  @IsOptional()
+  discordId?: string;
+}
+
 export class WalletAuthDto {
   @ApiProperty({
     description: 'Ethereum wallet address',
@@ -113,7 +161,7 @@ export class UpdateRolesDto {
     example: 1
   })
   @IsNotEmpty()
-  userId: number;
+  userId: number = 0;
 
   @ApiProperty({
     description: 'User roles',
@@ -123,5 +171,5 @@ export class UpdateRolesDto {
   @IsArray()
   @IsString({ each: true })
   @IsNotEmpty()
-  roles: string[];
+  roles: string[] = ['user'];
 }

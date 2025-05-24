@@ -16,39 +16,39 @@ export enum WalletType {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column({ unique: true })
-  walletAddress: string;
+  walletAddress: string = '';
 
   @Column({ 
     type: 'enum', 
     enum: WalletType, 
     default: WalletType.ETHEREUM 
   })
-  walletType: WalletType;
+  walletType: WalletType = WalletType.ETHEREUM;
 
-  @Column()
-  nonce: string;
+  @Column({ default: '' })
+  nonce: string = '';
 
   @Column({ type: 'float', default: 0 })
-  kntBalance: number;
+  kntBalance: number = 0;
 
   @Column({ nullable: true })
-  twitterId: string;
+  twitterId?: string;
 
   @Column({ nullable: true })
-  discordId: string;
+  discordId?: string;
 
   @Column({
     type: 'simple-array',
     default: UserRole.USER,
   })
-  roles: string[];
+  roles: string[] = [UserRole.USER];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

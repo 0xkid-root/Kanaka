@@ -7,7 +7,7 @@ export class RebalanceTriggerDto {
     example: true
   })
   @IsBoolean()
-  manualTrigger: boolean;
+  manualTrigger: boolean = false;
 
   @ApiProperty({
     description: 'Admin wallet address that triggered the rebalance',
@@ -16,7 +16,7 @@ export class RebalanceTriggerDto {
   })
   @IsEthereumAddress()
   @IsOptional()
-  adminAddress?: string;
+  adminAddress?: string = '';
 
   @ApiProperty({
     description: 'Reason for manual rebalance',
@@ -25,7 +25,7 @@ export class RebalanceTriggerDto {
   })
   @IsString()
   @IsOptional()
-  reason?: string;
+  reason?: string = '';
 }
 
 export class RebalanceHistoryResponseDto {
@@ -33,13 +33,13 @@ export class RebalanceHistoryResponseDto {
     description: 'Rebalance ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Timestamp of rebalance',
     example: '2025-05-23T02:10:26+05:30'
   })
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @ApiProperty({
     description: 'Previous portfolio weights',
@@ -49,7 +49,7 @@ export class RebalanceHistoryResponseDto {
       '3': 0.3
     }
   })
-  oldWeights: Record<string, number>;
+  oldWeights: Record<string, number> = {};
 
   @ApiProperty({
     description: 'New portfolio weights',
@@ -59,33 +59,72 @@ export class RebalanceHistoryResponseDto {
       '3': 0.25
     }
   })
-  newWeights: Record<string, number>;
+  newWeights: Record<string, number> = {};
 
   @ApiProperty({
     description: 'Correlation-Driven Risk value',
     example: 1.75
   })
-  cdrValue: number;
+  cdrValue: number = 0;
 
   @ApiProperty({
     description: 'Whether CDR threshold was breached',
     example: true
   })
-  thresholdBreached: boolean;
+  thresholdBreached: boolean = false;
 
   @ApiProperty({
     description: 'Transaction hash if rebalance was executed on-chain',
     example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
     required: false
   })
-  transactionHash?: string;
+  transactionHash?: string = '';
 
   @ApiProperty({
     description: 'Rebalance status',
     example: 'completed',
     enum: ['pending', 'completed', 'failed']
   })
-  status: 'pending' | 'completed' | 'failed';
+  status: 'pending' | 'completed' | 'failed' = 'pending';
+}
+
+// Define the item class first to avoid the "used before declaration" error
+export class PortfolioAllocationItemDto {
+  @ApiProperty({
+    description: 'Pool ID',
+    example: 1
+  })
+  poolId: number = 0;
+
+  @ApiProperty({
+    description: 'Pool name',
+    example: 'Starknet ETH/USDC'
+  })
+  poolName: string = '';
+
+  @ApiProperty({
+    description: 'Portfolio weight',
+    example: 0.25
+  })
+  weight: number = 0;
+
+  @ApiProperty({
+    description: 'Current yield percentage',
+    example: 5.75
+  })
+  yield: number = 0;
+
+  @ApiProperty({
+    description: 'Yield volatility',
+    example: 0.82
+  })
+  volatility: number = 0;
+
+  @ApiProperty({
+    description: 'Pool score (yield/volatility)',
+    example: 7.01
+  })
+  score: number = 0;
 }
 
 export class PortfolioAllocationResponseDto {
@@ -93,61 +132,23 @@ export class PortfolioAllocationResponseDto {
     description: 'List of pool allocations',
     type: [PortfolioAllocationItemDto]
   })
-  allocations: PortfolioAllocationItemDto[];
+  allocations: PortfolioAllocationItemDto[] = [];
 
   @ApiProperty({
     description: 'Current CDR value',
     example: 1.75
   })
-  cdrValue: number;
+  cdrValue: number = 0;
 
   @ApiProperty({
     description: 'Portfolio volatility',
     example: 0.65
   })
-  portfolioVolatility: number;
+  portfolioVolatility: number = 0;
 
   @ApiProperty({
     description: 'Average correlation between pools',
     example: 0.32
   })
-  averageCorrelation: number;
-}
-
-export class PortfolioAllocationItemDto {
-  @ApiProperty({
-    description: 'Pool ID',
-    example: 1
-  })
-  poolId: number;
-
-  @ApiProperty({
-    description: 'Pool name',
-    example: 'Starknet ETH/USDC'
-  })
-  poolName: string;
-
-  @ApiProperty({
-    description: 'Portfolio weight',
-    example: 0.25
-  })
-  weight: number;
-
-  @ApiProperty({
-    description: 'Current yield percentage',
-    example: 5.75
-  })
-  yield: number;
-
-  @ApiProperty({
-    description: 'Yield volatility',
-    example: 0.82
-  })
-  volatility: number;
-
-  @ApiProperty({
-    description: 'Pool score (yield/volatility)',
-    example: 7.01
-  })
-  score: number;
+  averageCorrelation: number = 0;
 }

@@ -72,13 +72,21 @@ export class UserService {
   }
 
   async findById(id: number): Promise<User> {
-    return await this.userRepository.findOne({ where: { id } });
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new Error(`User with id ${id} not found`);
+    }
+    return user;
   }
 
   async findByWalletAddress(walletAddress: string): Promise<User> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { walletAddress: walletAddress.toLowerCase() },
     });
+    if (!user) {
+      throw new Error(`User with wallet address ${walletAddress} not found`);
+    }
+    return user;
   }
 
   async updateProfile(id: number, data: Partial<User>): Promise<User> {

@@ -93,7 +93,7 @@ export class HealthController {
       };
       
       if (healthStatus.status === 'error') {
-        this.logger.warn('Health check failed', response);
+        this.logger.warn('Health check failed');
         throw new HttpException(response, HttpStatus.SERVICE_UNAVAILABLE);
       }
       
@@ -104,7 +104,9 @@ export class HealthController {
         throw error;
       }
       
-      this.logger.error(`Health check error: ${error.message}`, error.stack);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Health check error: ${errorMessage}`, errorStack);
       throw new HttpException(
         {
           status: 'error',

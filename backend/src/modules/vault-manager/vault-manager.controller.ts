@@ -123,7 +123,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch pool',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -196,7 +196,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch balance',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -249,7 +249,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch total supply',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -292,7 +292,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch balances',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -377,7 +377,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to process deposit',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -475,7 +475,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to process withdrawal',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -539,7 +539,7 @@ export class VaultManagerController {
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to add pool',
-          message: error.message,
+          message: errorMessage,
         },
         HttpStatus.BAD_REQUEST,
       );

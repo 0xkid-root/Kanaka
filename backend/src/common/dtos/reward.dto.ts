@@ -2,24 +2,24 @@ import { IsString, IsNumber } from 'class-validator';
 
 export class DistributeRewardDto {
   @IsString()
-  user: string;
+  user: string = '';
 
   @IsString()
-  amount: string;
+  amount: string = '';
 }
 
 export class AuthorizeDistributorDto {
   @IsString()
-  distributor: string;
+  distributor: string = '';
 }
 
 export class RewardDto {
   @IsString()
-  amount: string;
+  amount: string = '';
 
   @IsString()
-  user: string;
+  user: string = '';
 
   @IsNumber()
-  timestamp: number;
+  timestamp: number = 0;
 }

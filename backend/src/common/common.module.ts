@@ -8,8 +8,9 @@ import { SignatureService } from './services/signature.service';
 import { RedisService } from './services/redis.service';
 import { EventListenerService } from './services/event-listener.service';
 import { TransactionService } from './services/transaction.service';
-import { TransactionMonitorService } from './services/transaction-monitor.service';
-import { GasOptimizerService } from './services/gas-optimizer.service';
+// These services will be implemented later
+// import { TransactionMonitorService } from './services/transaction-monitor.service';
+// import { GasOptimizerService } from './services/gas-optimizer.service';
 import { AppLoggerService } from './services/logging.service';
 import { HealthService } from './services/health.service';
 import { LockService } from './services/lock.service';

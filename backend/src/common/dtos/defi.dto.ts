@@ -8,7 +8,7 @@ export class DepositDto {
   })
   @IsEthereumAddress()
   @IsNotEmpty()
-  userAddress: string;
+  userAddress: string = '';
 
   @ApiProperty({
     description: 'Amount to deposit',
@@ -16,7 +16,7 @@ export class DepositDto {
   })
   @IsNumber()
   @Min(0)
-  amount: number;
+  amount: number = 0;
 
   @ApiProperty({
     description: 'Pool address or identifier',
@@ -24,7 +24,7 @@ export class DepositDto {
   })
   @IsString()
   @IsNotEmpty()
-  pool: string;
+  pool: string = '';
 }
 
 export class WithdrawDto {
@@ -34,7 +34,7 @@ export class WithdrawDto {
   })
   @IsEthereumAddress()
   @IsNotEmpty()
-  userAddress: string;
+  userAddress: string = '';
 
   @ApiProperty({
     description: 'Amount to withdraw',
@@ -42,7 +42,7 @@ export class WithdrawDto {
   })
   @IsNumber()
   @Min(0)
-  amount: number;
+  amount: number = 0;
 
   @ApiProperty({
     description: 'Pool address or identifier',
@@ -50,7 +50,7 @@ export class WithdrawDto {
   })
   @IsString()
   @IsNotEmpty()
-  pool: string;
+  pool: string = '';
 }
 
 export class PoolResponseDto {
@@ -58,49 +58,49 @@ export class PoolResponseDto {
     description: 'Pool ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Pool name',
     example: 'Starknet ETH/USDC'
   })
-  name: string;
+  name: string = '';
 
   @ApiProperty({
     description: 'Pool contract address',
     example: '0xabcdef1234567890abcdef1234567890abcdef12'
   })
-  address: string;
+  address: string = '';
 
   @ApiProperty({
     description: 'Protocol name',
     example: 'JediSwap'
   })
-  protocol: string;
+  protocol: string = '';
 
   @ApiProperty({
     description: 'Current yield percentage',
     example: 5.75
   })
-  currentYield: number;
+  currentYield: number = 0;
 
   @ApiProperty({
     description: 'Yield volatility',
     example: 0.82
   })
-  volatility: number;
+  volatility: number = 0;
 
   @ApiProperty({
     description: 'Pool score (yield/volatility)',
     example: 7.01
   })
-  score: number;
+  score: number = 0;
 
   @ApiProperty({
     description: 'Current portfolio weight',
     example: 0.25
   })
-  weight: number;
+  weight: number = 0;
 
   @ApiProperty({
     description: 'Yield model parameters',
@@ -114,7 +114,7 @@ export class PoolResponseDto {
     a: number;
     b: number;
     c: number;
-  };
+  } = { a: 0, b: 0, c: 0 };
 }
 
 export class TransactionResponseDto {
@@ -122,12 +122,12 @@ export class TransactionResponseDto {
     description: 'Transaction hash',
     example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
   })
-  transactionHash: string;
+  transactionHash: string = '';
 
   @ApiProperty({
     description: 'Transaction status',
     example: 'pending',
     enum: ['pending', 'completed', 'failed']
   })
-  status: 'pending' | 'completed' | 'failed';
+  status: 'pending' | 'completed' | 'failed' = 'pending';
 }

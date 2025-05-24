@@ -8,7 +8,7 @@ export class SocialPostDto {
     example: 'twitter'
   })
   @IsEnum(['twitter', 'discord'])
-  platform: 'twitter' | 'discord';
+  platform: 'twitter' | 'discord' = 'twitter';
 
   @ApiProperty({
     description: 'Message content to post',
@@ -16,7 +16,7 @@ export class SocialPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  message: string;
+  message: string = '';
 
   @ApiProperty({
     description: 'Optional URL to an image to include with the post',
@@ -25,7 +25,7 @@ export class SocialPostDto {
   })
   @IsUrl()
   @IsOptional()
-  imageUrl?: string;
+  imageUrl?: string = '';
 }
 
 export class ForumPostDto {
@@ -35,7 +35,7 @@ export class ForumPostDto {
   })
   @IsNumber()
   @Min(1)
-  userId: number;
+  userId: number = 0;
 
   @ApiProperty({
     description: 'Post title',
@@ -43,7 +43,7 @@ export class ForumPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Post content',
@@ -51,7 +51,7 @@ export class ForumPostDto {
   })
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content: string = '';
 }
 
 export class ForumCommentDto {
@@ -61,7 +61,7 @@ export class ForumCommentDto {
   })
   @IsNumber()
   @Min(1)
-  postId: number;
+  postId: number = 0;
 
   @ApiProperty({
     description: 'User ID',
@@ -69,7 +69,7 @@ export class ForumCommentDto {
   })
   @IsNumber()
   @Min(1)
-  userId: number;
+  userId: number = 0;
 
   @ApiProperty({
     description: 'Comment content',
@@ -77,7 +77,7 @@ export class ForumCommentDto {
   })
   @IsString()
   @IsNotEmpty()
-  content: string;
+  content: string = '';
 }
 
 export class ForumPostResponseDto {
@@ -85,55 +85,55 @@ export class ForumPostResponseDto {
     description: 'Post ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'User ID',
     example: 1
   })
-  userId: number;
+  userId: number = 0;
 
   @ApiProperty({
     description: 'Post title',
     example: 'Thoughts on the latest rebalance strategy'
   })
-  title: string;
+  title: string = '';
 
   @ApiProperty({
     description: 'Post content',
     example: 'I think the current rebalance strategy is working well, but we could improve by...'
   })
-  content: string;
+  content: string = '';
 
   @ApiProperty({
     description: 'IPFS hash where the content is stored',
     example: 'QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco'
   })
-  ipfsHash: string;
+  ipfsHash: string = '';
 
   @ApiProperty({
     description: 'Number of upvotes',
     example: 15
   })
-  upvotes: number;
+  upvotes: number = 0;
 
   @ApiProperty({
     description: 'Number of downvotes',
     example: 3
   })
-  downvotes: number;
+  downvotes: number = 0;
 
   @ApiProperty({
     description: 'Post creation timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @ApiProperty({
     description: 'Post last update timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }
 
 export class SocialPostResponseDto {
@@ -141,14 +141,14 @@ export class SocialPostResponseDto {
     description: 'Success status',
     example: true
   })
-  success: boolean;
+  success: boolean = false;
 
   @ApiProperty({
     description: 'Platform post ID or message',
     example: '1234567890',
     required: false
   })
-  postId?: string;
+  postId?: string = '';
 
   @ApiProperty({
     description: 'Post URL if available',
@@ -157,5 +157,5 @@ export class SocialPostResponseDto {
   })
   @IsUrl()
   @IsOptional()
-  postUrl?: string;
+  postUrl?: string = '';
 }

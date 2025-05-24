@@ -34,12 +34,12 @@ export interface RetryOptions {
   /**
    * Custom function to determine if a retry should be attempted
    */
-  shouldRetry?: (error: Error, attempt: number) => boolean;
+  shouldRetry?: (error: unknown, attempt: number) => boolean;
   
   /**
    * Custom function to execute before each retry
    */
-  onRetry?: (error: Error, attempt: number) => void;
+  onRetry?: (error: unknown, attempt: number) => void;
 }
 
 /**
@@ -61,12 +61,12 @@ export function Retry(options: RetryOptions = {}) {
   const opts = { ...defaultOptions, ...options };
   const logger = new Logger('RetryDecorator');
   
-  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function(_target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     
     descriptor.value = async function(...args: any[]) {
       let attempt = 0;
-      let lastError: Error;
+      let lastError: unknown = new Error('Unknown error occurred');
       
       while (attempt <= opts.maxRetries) {
         try {
@@ -77,7 +77,8 @@ export function Retry(options: RetryOptions = {}) {
           
           // Check if we've reached the maximum number of retries
           if (attempt > opts.maxRetries) {
-            logger.error(`Method ${propertyKey} failed after ${opts.maxRetries} retries: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.error(`Method ${propertyKey} failed after ${opts.maxRetries} retries: ${errorMessage}`);
             throw error;
           }
           
@@ -89,7 +90,8 @@ export function Retry(options: RetryOptions = {}) {
               !opts.retryOnErrors.some(errorType => error instanceof errorType));
           
           if (shouldNotRetry || !opts.shouldRetry(error, attempt)) {
-            logger.warn(`Not retrying method ${propertyKey} after error: ${error.message}`);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            logger.warn(`Not retrying method ${propertyKey} after error: ${errorMessage}`);
             throw error;
           }
           
@@ -102,7 +104,8 @@ export function Retry(options: RetryOptions = {}) {
             );
           }
           
-          logger.warn(`Retrying method ${propertyKey} (attempt ${attempt}/${opts.maxRetries}) after error: ${error.message}`);
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          logger.warn(`Retrying method ${propertyKey} (attempt ${attempt}/${opts.maxRetries}) after error: ${errorMessage}`);
           
           // Call the onRetry callback
           opts.onRetry(error, attempt);

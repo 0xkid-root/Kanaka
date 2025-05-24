@@ -6,8 +6,13 @@ import { SetMetadata } from '@nestjs/common';
  */
 export const SkipThrottle = () => {
   return (target: any, key?: string, descriptor?: any) => {
-    SetMetadata('skipThrottle', true)(target, key, descriptor);
-    SetMetadata('skipRateLimit', true)(target, key, descriptor);
+    if (key) {
+      SetMetadata('skipThrottle', true)(target, key, descriptor);
+      SetMetadata('skipRateLimit', true)(target, key, descriptor);
+    } else {
+      SetMetadata('skipThrottle', true)(target);
+      SetMetadata('skipRateLimit', true)(target);
+    }
     return descriptor;
   };
 };

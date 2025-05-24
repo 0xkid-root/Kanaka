@@ -18,6 +18,7 @@ import {
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { User } from './entities/user.entity';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { 
   CreateNonceDto, 
@@ -76,7 +77,12 @@ export class UserController {
   })
   @ApiBody({ type: UpdateProfileDto })
   async updateProfile(@Req() req: any, @Body() data: UpdateProfileDto) {
-    return await this.userService.updateProfile(req.user.id, data);
+    // Convert UpdateProfileDto to Partial<User>
+    // Convert UpdateProfileDto to Partial<User> with proper handling of undefined values
+    const userData: Partial<User> = {};
+    if (data.twitterId !== undefined) userData.twitterId = data.twitterId;
+    if (data.discordId !== undefined) userData.discordId = data.discordId;
+    return await this.userService.updateProfile(req.user.id, userData);
   }
 
   @Put('roles')

@@ -17,7 +17,8 @@ export class StrategyRegistryService implements OnModuleInit {
     private poolRepository: Repository<Pool>,
     @InjectRepository(StrategyExecution)
     private strategyExecutionRepository: Repository<StrategyExecution>,
-    private contractService: ContractService,
+    // Keep contractService for future use
+    private readonly contractService: ContractService,
     private transactionService: TransactionService,
     private eventListenerService: EventListenerService,
     loggerService: AppLoggerService,
@@ -27,6 +28,13 @@ export class StrategyRegistryService implements OnModuleInit {
 
   async onModuleInit() {
     this.subscribeToEvents();
+  }
+  
+  private handleError(error: unknown, logMessage: string): { errorMessage: string, errorStack?: string | undefined } {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    this.logger.debug(`${logMessage}: ${errorMessage}`);
+    return { errorMessage, errorStack };
   }
 
   private async subscribeToEvents() {
@@ -49,7 +57,8 @@ export class StrategyRegistryService implements OnModuleInit {
         await this.poolRepository.save(pool);
         this.logger.log(`Saved new pool ${event.poolId} to database`);
       } catch (error) {
-        this.logger.error(`Error processing PoolAdded event: ${error.message}`, error.stack);
+        const { errorMessage, errorStack } = this.handleError(error, 'Error processing PoolAdded event');
+        this.logger.error(`Error processing PoolAdded event: ${errorMessage}`, errorStack);
       }
     });
 
@@ -69,7 +78,8 @@ export class StrategyRegistryService implements OnModuleInit {
         
         this.logger.log(`Updated pool ${event.poolId} in database`);
       } catch (error) {
-        this.logger.error(`Error processing PoolUpdated event: ${error.message}`, error.stack);
+        const { errorMessage, errorStack } = this.handleError(error, 'Error processing PoolUpdated event');
+        this.logger.error(`Error processing PoolUpdated event: ${errorMessage}`, errorStack);
       }
     });
 
@@ -87,7 +97,8 @@ export class StrategyRegistryService implements OnModuleInit {
         await this.strategyExecutionRepository.save(execution);
         this.logger.log(`Saved strategy execution for pool ${event.poolId} to database`);
       } catch (error) {
-        this.logger.error(`Error processing StrategyExecuted event: ${error.message}`, error.stack);
+        const { errorMessage, errorStack } = this.handleError(error, 'Error processing StrategyExecuted event');
+        this.logger.error(`Error processing StrategyExecuted event: ${errorMessage}`, errorStack);
       }
     });
     
@@ -116,7 +127,8 @@ export class StrategyRegistryService implements OnModuleInit {
         transactionHash: receipt.transactionHash,
       };
     } catch (error) {
-      this.logger.error(`Failed to add pool: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, 'Failed to add pool');
+      this.logger.error(`Failed to add pool: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -143,7 +155,8 @@ export class StrategyRegistryService implements OnModuleInit {
         transactionHash: receipt.transactionHash,
       };
     } catch (error) {
-      this.logger.error(`Failed to update pool ${dto.poolId}: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, `Failed to update pool ${dto.poolId}`);
+      this.logger.error(`Failed to update pool ${dto.poolId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -170,7 +183,8 @@ export class StrategyRegistryService implements OnModuleInit {
         transactionHash: receipt.transactionHash,
       };
     } catch (error) {
-      this.logger.error(`Failed to execute rebalance: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, 'Failed to execute rebalance');
+      this.logger.error(`Failed to execute rebalance: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -193,7 +207,8 @@ export class StrategyRegistryService implements OnModuleInit {
         maxCapacity: pool.max_capacity.toString(),
       };
     } catch (error) {
-      this.logger.error(`Failed to get pool ${poolId}: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, `Failed to get pool ${poolId}`);
+      this.logger.error(`Failed to get pool ${poolId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -210,7 +225,8 @@ export class StrategyRegistryService implements OnModuleInit {
       
       return count.toString();
     } catch (error) {
-      this.logger.error(`Failed to get pool count: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, 'Failed to get pool count');
+      this.logger.error(`Failed to get pool count: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -227,40 +243,50 @@ export class StrategyRegistryService implements OnModuleInit {
       
       return isValid;
     } catch (error) {
-      this.logger.error(`Failed to check if deposit is valid for pool ${poolId}: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, `Failed to check if deposit is valid for pool ${poolId}`);
+      this.logger.error(`Failed to check if deposit is valid for pool ${poolId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }
 
-  async getPools() {
+  async getPools(active?: boolean, limit: number = 10, offset: number = 0) {
     try {
-      this.logger.debug('Getting all pools from database');
+      this.logger.debug(`Getting pools from database with filters: active=${active}, limit=${limit}, offset=${offset}`);
+      
+      const where = active !== undefined ? { active } : {};
       
       const pools = await this.poolRepository.find({
-        order: { createdAt: 'DESC' }
+        where,
+        order: { createdAt: 'DESC' },
+        take: limit,
+        skip: offset
       });
       
       this.logger.debug(`Found ${pools.length} pools`);
       return pools;
     } catch (error) {
-      this.logger.error(`Failed to get pools from database: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, 'Failed to get pools from database');
+      this.logger.error(`Failed to get pools from database: ${errorMessage}`, errorStack);
       throw error;
     }
   }
 
-  async getStrategyExecutions(poolId: string) {
+  async getStrategyExecutions(poolId: string, limit: number = 10, offset: number = 0) {
     try {
-      this.logger.debug(`Getting strategy executions for poolId: ${poolId}`);
+      this.logger.debug(`Getting strategy executions for poolId: ${poolId}, limit: ${limit}, offset: ${offset}`);
       
       const executions = await this.strategyExecutionRepository.find({
         where: { poolId },
-        order: { executedAt: 'DESC' }
+        order: { executedAt: 'DESC' },
+        take: limit,
+        skip: offset
       });
       
       this.logger.debug(`Found ${executions.length} strategy executions for pool ${poolId}`);
       return executions;
     } catch (error) {
-      this.logger.error(`Failed to get strategy executions for pool ${poolId}: ${error.message}`, error.stack);
+      const { errorMessage, errorStack } = this.handleError(error, `Failed to get strategy executions for pool ${poolId}`);
+      this.logger.error(`Failed to get strategy executions for pool ${poolId}: ${errorMessage}`, errorStack);
       throw error;
     }
   }

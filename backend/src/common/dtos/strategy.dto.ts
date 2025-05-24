@@ -9,7 +9,7 @@ export class AddPoolDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  token: string;
+  token: string = '';
 
   @ApiProperty({
     description: 'Strategy contract address',
@@ -18,7 +18,7 @@ export class AddPoolDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  strategy: string;
+  strategy: string = '';
 
   @ApiProperty({
     description: 'Minimum deposit amount (in wei)',
@@ -26,7 +26,7 @@ export class AddPoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  minDeposit: string;
+  minDeposit: string = '0';
 
   @ApiProperty({
     description: 'Maximum capacity of the pool (in wei)',
@@ -34,7 +34,7 @@ export class AddPoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  maxCapacity: string;
+  maxCapacity: string = '0';
 }
 
 export class UpdatePoolDto {
@@ -44,14 +44,14 @@ export class UpdatePoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Whether the pool is active',
     example: true
   })
   @IsBoolean()
-  active: boolean;
+  active: boolean = true;
 
   @ApiProperty({
     description: 'Minimum deposit amount (in wei)',
@@ -59,7 +59,7 @@ export class UpdatePoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  minDeposit: string;
+  minDeposit: string = '0';
 
   @ApiProperty({
     description: 'Maximum capacity of the pool (in wei)',
@@ -67,7 +67,7 @@ export class UpdatePoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  maxCapacity: string;
+  maxCapacity: string = '0';
 }
 
 export class PoolDto {
@@ -77,7 +77,7 @@ export class PoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Token contract address',
@@ -86,7 +86,7 @@ export class PoolDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  token: string;
+  token: string = '';
 
   @ApiProperty({
     description: 'Strategy contract address',
@@ -95,14 +95,14 @@ export class PoolDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  strategy: string;
+  strategy: string = '';
 
   @ApiProperty({
     description: 'Whether the pool is active',
     example: true
   })
   @IsBoolean()
-  active: boolean;
+  active: boolean = true;
 
   @ApiProperty({
     description: 'Minimum deposit amount (in wei)',
@@ -110,7 +110,7 @@ export class PoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  minDeposit: string;
+  minDeposit: string = '0';
 
   @ApiProperty({
     description: 'Maximum capacity of the pool (in wei)',
@@ -118,7 +118,7 @@ export class PoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  maxCapacity: string;
+  maxCapacity: string = '0';
 }
 
 export class StrategyExecutionDto {
@@ -126,25 +126,25 @@ export class StrategyExecutionDto {
     description: 'Execution ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Pool ID',
     example: 'pool-1'
   })
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Timestamp of execution',
     example: '2025-05-23T02:10:26+05:30'
   })
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @ApiProperty({
     description: 'Transaction hash',
     example: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef'
   })
-  txHash: string;
+  txHash: string = '';
 
   @ApiProperty({
     description: 'Performance metrics',
@@ -154,7 +154,7 @@ export class StrategyExecutionDto {
       fees: '10000000000000000'
     }
   })
-  metrics: any;
+  metrics: any = {};
 }
 
 export class RebalanceWeightsDto {
@@ -165,41 +165,41 @@ export class RebalanceWeightsDto {
   })
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  weights: string[];
+  weights: string[] = [];
 }
 
 export class StrategyUpdateDto {
   @ApiProperty({ description: 'Strategy identifier' })
   @IsString()
   @IsNotEmpty()
-  strategyId: string;
+  strategyId: string = '';
 
   @ApiProperty({ description: 'Current TVL in strategy' })
   @IsNumber()
   @IsPositive()
-  tvl: number;
+  tvl: number = 0;
 
   @ApiProperty({ description: 'Current APY' })
   @IsNumber()
-  apy: number;
+  apy: number = 0;
 
   @ApiProperty({ description: 'Risk score (0-100)' })
   @IsNumber()
   @Min(0)
-  riskScore: number;
+  riskScore: number = 0;
 
   @ApiProperty({ description: 'Strategy status' })
   @IsString()
-  status: 'active' | 'paused' | 'deprecated';
+  status: 'active' | 'paused' | 'deprecated' = 'active';
 
   @ApiProperty({ description: 'Gas efficiency score' })
   @IsNumber()
   @IsOptional()
-  gasEfficiency?: number;
+  gasEfficiency?: number = 0;
 
   @ApiProperty({ description: 'Current allocation percentage' })
   @IsNumber()
-  allocationPercentage: number;
+  allocationPercentage: number = 0;
 
   @ApiProperty({ description: 'Performance metrics' })
   performanceMetrics: {
@@ -207,8 +207,13 @@ export class StrategyUpdateDto {
     weekly: number;
     monthly: number;
     yearly: number;
+  } = {
+    daily: 0,
+    weekly: 0,
+    monthly: 0,
+    yearly: 0
   };
 
   @ApiProperty({ description: 'Last update timestamp' })
-  lastUpdated: Date;
+  lastUpdated: Date = new Date();
 }
