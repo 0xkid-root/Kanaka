@@ -2,11 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { ContractService } from './contract.service';
 import { AppConfigService } from './config.service';
 import { AppLoggerService } from './logging.service';
-import { RedisService } from './redis.service';
+// import { RedisService } from './redis.service'; // Import is unused
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
 import { User } from '../../modules/user/entities/user.entity';
-import * as os from 'os';
 
 interface HealthStatus {
   status: 'ok' | 'error' | 'degraded';
@@ -67,7 +66,7 @@ export class HealthService {
   constructor(
     private contractService: ContractService,
     private configService: AppConfigService,
-    private redisService: RedisService,
+    // private redisService: RedisService, // Parameter is unused
     loggerService: AppLoggerService,
     private connection: Connection,
     @InjectRepository(User)

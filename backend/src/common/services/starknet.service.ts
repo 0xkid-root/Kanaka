@@ -6,14 +6,14 @@ export class StarknetService {
   constructor(private contractService: ContractService) {}
 
   // VaultManager functions
-  async deposit(userAddress: string, amount: number, poolId: string) {
+  async deposit(amount: number, poolId: string) {
     return await this.contractService.execute('VaultManager', 'deposit', [
       poolId,
       amount,
     ]);
   }
 
-  async withdraw(userAddress: string, amount: number, poolId: string) {
+  async withdraw(amount: number, poolId: string) {
     return await this.contractService.execute('VaultManager', 'withdraw', [
       poolId,
       amount,

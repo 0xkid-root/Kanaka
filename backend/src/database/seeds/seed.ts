@@ -11,7 +11,7 @@ config();
 const configService = new ConfigService();
 
 // Database configuration
-const isProduction = configService.get('NODE_ENV') === 'production';
+// const isProduction = configService.get('NODE_ENV') === 'production'; // Variable is unused
 const dataSource = new DataSource({
   type: 'postgres',
   host: configService.get('DATABASE_HOST') || 'localhost',

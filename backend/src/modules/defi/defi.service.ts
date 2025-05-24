@@ -47,13 +47,12 @@ export class DefiService {
     userId: number,
     poolId: number,
     amount: number,
-    walletAddress: string,
+    // walletAddress: string, // Parameter is unused
   ): Promise<Transaction> {
     const pool = await this.getPool(poolId);
 
     // Call Starknet contract
     const tx = await this.starknetService.deposit(
-      walletAddress,
       amount,
       poolId.toString(),
     );
@@ -91,13 +90,12 @@ export class DefiService {
     userId: number,
     poolId: number,
     amount: number,
-    walletAddress: string,
+    // walletAddress: string, // Parameter is unused
   ): Promise<Transaction> {
     const pool = await this.getPool(poolId);
 
     // Call Starknet contract
     const tx = await this.starknetService.withdraw(
-      walletAddress,
       amount,
       poolId.toString(),
     );
@@ -138,7 +136,7 @@ export class DefiService {
     });
   }
 
-  async getUserPoolBalance(userId: number, poolId: number, walletAddress: string): Promise<number> {
+  async getUserPoolBalance(poolId: number, walletAddress: string): Promise<number> {
     const balance = await this.starknetService.getUserBalance(walletAddress, poolId.toString());
     return Number(balance);
   }

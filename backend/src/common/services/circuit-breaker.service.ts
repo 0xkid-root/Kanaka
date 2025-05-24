@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppLoggerService } from './logging.service';
-import { RedisService } from './redis.service';
+// import { RedisService } from './redis.service'; // Import is unused
 
 enum CircuitState {
   CLOSED = 'CLOSED',
@@ -55,7 +55,7 @@ export class CircuitBreakerService {
   }> = new Map();
 
   constructor(
-    private redisService: RedisService,
+    // private redisService: RedisService, // Parameter is unused
     loggerService: AppLoggerService,
   ) {
     this.logger = loggerService.createLogger(CircuitBreakerService.name);

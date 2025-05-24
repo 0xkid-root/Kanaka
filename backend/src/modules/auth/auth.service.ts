@@ -6,7 +6,7 @@ import { User, WalletType } from '../user/entities/user.entity';
 import { SignatureService } from '../../common/services/signature.service';
 import { AppLoggerService } from '../../common/services/logging.service';
 import { RedisService } from '../../common/services/redis.service';
-import { AppConfigService } from '../../common/services/config.service';
+// import { AppConfigService } from '../../common/services/config.service'; // Import is unused
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -22,7 +22,7 @@ export class AuthService {
     private jwtService: JwtService,
     private signatureService: SignatureService,
     private redisService: RedisService,
-    private configService: AppConfigService,
+    // private configService: AppConfigService, // Parameter is unused
     loggerService: AppLoggerService,
   ) {
     this.logger = loggerService.createLogger(AuthService.name);

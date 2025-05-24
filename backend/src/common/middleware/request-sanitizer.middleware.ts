@@ -8,10 +8,9 @@ import * as sanitizeHtml from 'sanitize-html';
  */
 @Injectable()
 export class RequestSanitizerMiddleware implements NestMiddleware {
-  private readonly logger: AppLoggerService;
 
   constructor(loggerService: AppLoggerService) {
-    this.logger = loggerService.createLogger(RequestSanitizerMiddleware.name);
+    loggerService.createLogger(RequestSanitizerMiddleware.name);
   }
 
   /**
