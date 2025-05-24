@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+data:
+  redis.conf: |
+    maxmemory 512mb
+    maxmemory-policy allkeys-lru
+    appendonly yes
+    save 900 1
+    save 300 10
+    save 60 10000
+    requirepass ${REDIS_PASSWORD}
+    protected-mode yes
+    bind 0.0.0.0

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanaka-backend
+  labels:
+    app: kanaka-backend
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: kanaka-backend
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kanaka-redis
+  labels:
+    app: kanaka-redis
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6379
+      targetPort: 6379
+      protocol: TCP
+      name: redis
+  selector:
+    app: kanaka-redis

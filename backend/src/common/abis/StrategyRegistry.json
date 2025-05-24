@@ -1,0 +1,72 @@
+{
+  "abi": [
+    {
+      "name": "add_pool",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "token",
+          "type": "ContractAddress"
+        },
+        {
+          "name": "strategy",
+          "type": "ContractAddress"
+        },
+        {
+          "name": "min_deposit",
+          "type": "u256"
+        },
+        {
+          "name": "max_capacity",
+          "type": "u256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ]
+    },
+    {
+      "name": "execute_rebalance",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "new_weights",
+          "type": "Array<u256>"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "get_pool",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "pool",
+          "type": "Pool"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_pool_count",
+      "type": "function",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "count",
+          "type": "felt252"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

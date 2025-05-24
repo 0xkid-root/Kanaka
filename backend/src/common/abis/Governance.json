@@ -1,0 +1,84 @@
+{
+  "abi": [
+    {
+      "name": "propose",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "description",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "proposal_id",
+          "type": "u256"
+        }
+      ]
+    },
+    {
+      "name": "cast_vote",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "proposal_id",
+          "type": "u256"
+        },
+        {
+          "name": "support",
+          "type": "bool"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "execute_proposal",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "proposal_id",
+          "type": "u256"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "get_proposal",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "proposal_id",
+          "type": "u256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "proposal",
+          "type": "Proposal"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_vote",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "proposal_id",
+          "type": "u256"
+        },
+        {
+          "name": "voter",
+          "type": "ContractAddress"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "vote",
+          "type": "Vote"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

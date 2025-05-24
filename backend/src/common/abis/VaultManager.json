@@ -1,0 +1,72 @@
+{
+  "abi": [
+    {
+      "name": "deposit",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        },
+        {
+          "name": "amount",
+          "type": "u256"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "withdraw",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        },
+        {
+          "name": "amount",
+          "type": "u256"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "get_balance",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "user",
+          "type": "ContractAddress"
+        },
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "balance",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_total_supply",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "total_supply",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

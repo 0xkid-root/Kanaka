@@ -1,0 +1,35 @@
+# Node.js
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Production
+build/
+dist/
+
+# Miscellaneous
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# TypeScript
+tsconfig.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+docker-compose.yml
+
+# Others
+coverage/
+*.tsbuildinfo

@@ -1,0 +1,54 @@
+{
+  "abi": [
+    {
+      "name": "distribute_reward",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "user",
+          "type": "ContractAddress"
+        },
+        {
+          "name": "amount",
+          "type": "u256"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "claim_rewards",
+      "type": "function",
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "name": "get_rewards",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "user",
+          "type": "ContractAddress"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "rewards",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_total_distributed",
+      "type": "function",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "total",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

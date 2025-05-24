@@ -1,0 +1,55 @@
+{
+  "abi": [
+    {
+      "name": "rebalance",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "new_weights",
+          "type": "Array<u256>"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "harvest_yield",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "get_pool_weight",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "weight",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_total_weights",
+      "type": "function",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "total_weights",
+          "type": "u256"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}

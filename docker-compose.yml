@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: kanaka-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/logs:/app/logs
+    environment:
+      - NODE_ENV=development
+      - DATABASE_PATH=/app/data/kanaka.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - BLOCKCHAIN_RPC_URL=${BLOCKCHAIN_RPC_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - ADMIN_ADDRESSES=${ADMIN_ADDRESSES}
+      - CORS_ORIGINS=http://localhost:3001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      - redis
+    networks:
+      - kanaka-network
+
+  # Redis service for caching and rate limiting
+  redis:
+    image: redis:7-alpine
+    container_name: kanaka-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: >
+      --requirepass ${REDIS_PASSWORD}
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - kanaka-network
+
+  # Frontend service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: kanaka-frontend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3000/api
+      - NEXT_PUBLIC_WS_URL=ws://localhost:3000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - kanaka-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: kanaka-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./backend/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./backend/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./backend/nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-cache:/var/cache/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - kanaka-network
+
+  # Database backup service
+  backup:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.backup
+    container_name: kanaka-backup
+    volumes:
+      - ./backend/backups:/backups
+      - ./backend/scripts:/scripts
+    environment:
+      - BACKUP_SCHEDULE=0 */6 * * *  # Every 6 hours
+      - MAX_BACKUPS=10
+      - BACKUP_PATH=/backups
+    depends_on:
+      - redis
+    networks:
+      - kanaka-network
+
+volumes:
+  redis-data:
+    driver: local
+  nginx-cache:
+    driver: local
+
+networks:
+  kanaka-network:
+    driver: bridge

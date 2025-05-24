@@ -1,0 +1,76 @@
+{
+  "abi": [
+    {
+      "name": "update_pool_metrics",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        },
+        {
+          "name": "amount",
+          "type": "u256"
+        },
+        {
+          "name": "is_deposit",
+          "type": "bool"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "update_volatility",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        },
+        {
+          "name": "new_volatility",
+          "type": "u256"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "name": "get_pool_metrics",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "metrics",
+          "type": "PoolMetrics"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "name": "get_pool_yield",
+      "type": "function",
+      "inputs": [
+        {
+          "name": "pool_id",
+          "type": "felt252"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "yield_amount",
+          "type": "u256"
+        },
+        {
+          "name": "last_update",
+          "type": "u64"
+        }
+      ],
+      "stateMutability": "view"
+    }
+  ]
+}
