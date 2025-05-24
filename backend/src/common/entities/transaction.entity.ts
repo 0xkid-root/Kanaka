@@ -4,11 +4,11 @@ import { TransactionStatus } from '../enums/transaction-status.enum';
 @Entity('transactions')
 export class Transaction {
   @PrimaryColumn()
-  hash: string;
+  hash: string = '';
 
   @Column()
   @Index()
-  type: string;
+  type: string = '';
 
   @Column({
     type: 'enum',
@@ -16,35 +16,35 @@ export class Transaction {
     default: TransactionStatus.PENDING
   })
   @Index()
-  status: TransactionStatus;
+  status: TransactionStatus = TransactionStatus.PENDING;
 
   @Column({ default: 0 })
-  confirmations: number;
+  confirmations: number = 0;
 
   @Column({ nullable: true })
-  error: string;
+  error: string = '';
 
   @Column({ type: 'jsonb', default: {} })
-  metadata: Record<string, any>;
+  metadata: Record<string, any> = {};
 
   @Column({ default: 0 })
-  retryCount: number;
+  retryCount: number = 0;
 
   @Column({ nullable: true })
-  blockNumber: number;
+  blockNumber: number = 0;
 
   @Column({ nullable: true })
-  gasUsed: string;
+  gasUsed: string = '';
 
   @Column({ nullable: true })
-  gasPrice: string;
+  gasPrice: string = '';
 
   @Column({ nullable: true })
-  effectiveGasPrice: string;
+  effectiveGasPrice: string = '';
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

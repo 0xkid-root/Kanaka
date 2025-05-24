@@ -3,23 +3,23 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeor
 @Entity('votes')
 export class Vote {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  proposalId: number;
+  proposalId: number = 0;
 
   @Column()
-  voter: string;
+  voter: string = '';
 
   @Column({ type: 'decimal', precision: 36, scale: 0 })
-  weight: string;
+  weight: string = '0';
 
   @Column()
-  vote: 'yes' | 'no';
+  vote: 'yes' | 'no' = 'yes';
 
   @Column({ type: 'text', nullable: true })
-  reason: string;
+  reason: string = '';
 
   @CreateDateColumn()
-  timestamp: Date;
+  timestamp: Date = new Date();
 }

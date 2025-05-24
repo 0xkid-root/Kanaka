@@ -8,21 +8,21 @@ export class YieldCurveParamsDto {
     example: 4.5
   })
   @IsNumber()
-  a: number;
+  a: number = 0;
 
   @ApiProperty({
     description: 'Initial deviation',
     example: 2.1
   })
   @IsNumber()
-  b: number;
+  b: number = 0;
 
   @ApiProperty({
     description: 'Rate of decay',
     example: 0.03
   })
   @IsNumber()
-  c: number;
+  c: number = 0;
 }
 
 export class YieldCurveDto {
@@ -31,28 +31,28 @@ export class YieldCurveDto {
     example: 1
   })
   @IsNumber()
-  poolId: number;
+  poolId: number = 0;
 
   @ApiProperty({
     description: 'Pool name',
     example: 'Starknet ETH/USDC'
   })
   @IsString()
-  poolName: string;
+  poolName: string = '';
 
   @ApiProperty({
     description: 'Time points for the yield curve (in days)',
     example: [1, 7, 30, 90, 180, 365]
   })
   @IsArray()
-  timePoints: number[];
+  timePoints: number[] = [];
 
   @ApiProperty({
     description: 'Yield points corresponding to time points',
     example: [6.2, 5.8, 5.4, 5.1, 4.9, 4.7]
   })
   @IsArray()
-  yieldPoints: number[];
+  yieldPoints: number[] = [];
 
   @ApiProperty({
     description: 'Yield curve model parameters',
@@ -60,7 +60,7 @@ export class YieldCurveDto {
   })
   @ValidateNested()
   @Type(() => YieldCurveParamsDto)
-  modelParams: YieldCurveParamsDto;
+  modelParams: YieldCurveParamsDto = new YieldCurveParamsDto();
 }
 
 export class PoolMetricsDto {
@@ -69,49 +69,49 @@ export class PoolMetricsDto {
     example: 1
   })
   @IsNumber()
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Pool name',
     example: 'Starknet ETH/USDC'
   })
   @IsString()
-  name: string;
+  name: string = '';
 
   @ApiProperty({
     description: 'Current yield percentage',
     example: 5.75
   })
   @IsNumber()
-  currentYield: number;
+  currentYield: number = 0;
 
   @ApiProperty({
     description: 'Modeled yield based on curve fitting',
     example: 5.68
   })
   @IsNumber()
-  modeledYield: number;
+  modeledYield: number = 0;
 
   @ApiProperty({
     description: 'Yield volatility',
     example: 0.82
   })
   @IsNumber()
-  volatility: number;
+  volatility: number = 0;
 
   @ApiProperty({
     description: 'Pool score (yield/volatility)',
     example: 7.01
   })
   @IsNumber()
-  score: number;
+  score: number = 0;
 
   @ApiProperty({
     description: 'Current portfolio weight',
     example: 0.25
   })
   @IsNumber()
-  weight: number;
+  weight: number = 0;
 }
 
 export class CorrelationMatrixDto {
@@ -120,14 +120,14 @@ export class CorrelationMatrixDto {
     example: [1, 2, 3]
   })
   @IsArray()
-  poolIds: number[];
+  poolIds: number[] = [];
 
   @ApiProperty({
     description: 'Pool names in the correlation matrix',
     example: ['Starknet ETH/USDC', 'Starknet ETH/DAI', 'Starknet USDC/DAI']
   })
   @IsArray()
-  poolNames: string[];
+  poolNames: string[] = [];
 
   @ApiProperty({
     description: 'Correlation matrix as 2D array',
@@ -138,7 +138,7 @@ export class CorrelationMatrixDto {
     ]
   })
   @IsArray()
-  correlations: number[][];
+  correlations: number[][] = [];
 }
 
 export class AllocationChartDto {
@@ -147,28 +147,28 @@ export class AllocationChartDto {
     example: [1, 2, 3]
   })
   @IsArray()
-  poolIds: number[];
+  poolIds: number[] = [];
 
   @ApiProperty({
     description: 'Pool names in the allocation chart',
     example: ['Starknet ETH/USDC', 'Starknet ETH/DAI', 'Starknet USDC/DAI']
   })
   @IsArray()
-  poolNames: string[];
+  poolNames: string[] = [];
 
   @ApiProperty({
     description: 'Portfolio weights',
     example: [0.25, 0.5, 0.25]
   })
   @IsArray()
-  weights: number[];
+  weights: number[] = [];
 
   @ApiProperty({
     description: 'Colors for chart visualization',
     example: ['#FF5733', '#33FF57', '#3357FF']
   })
   @IsArray()
-  colors: string[];
+  colors: string[] = [];
 }
 
 export class MetricsResponseDto {
@@ -176,28 +176,28 @@ export class MetricsResponseDto {
     description: 'Timestamp of metrics',
     example: '2025-05-23T02:10:26+05:30'
   })
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @ApiProperty({
     description: 'Correlation-Driven Risk value',
     example: 1.75
   })
   @IsNumber()
-  cdr: number;
+  cdr: number = 0;
 
   @ApiProperty({
     description: 'Portfolio volatility',
     example: 0.65
   })
   @IsNumber()
-  portfolioVolatility: number;
+  portfolioVolatility: number = 0;
 
   @ApiProperty({
     description: 'Average correlation between pools',
     example: 0.32
   })
   @IsNumber()
-  averageCorrelation: number;
+  averageCorrelation: number = 0;
 
   @ApiProperty({
     description: 'Pool metrics',
@@ -205,7 +205,7 @@ export class MetricsResponseDto {
   })
   @ValidateNested({ each: true })
   @Type(() => PoolMetricsDto)
-  pools: PoolMetricsDto[];
+  pools: PoolMetricsDto[] = [];
 
   @ApiProperty({
     description: 'Yield curves for each pool',
@@ -213,7 +213,7 @@ export class MetricsResponseDto {
   })
   @ValidateNested({ each: true })
   @Type(() => YieldCurveDto)
-  yieldCurves: YieldCurveDto[];
+  yieldCurves: YieldCurveDto[] = [];
 
   @ApiProperty({
     description: 'Correlation matrix between pools',
@@ -221,7 +221,7 @@ export class MetricsResponseDto {
   })
   @ValidateNested()
   @Type(() => CorrelationMatrixDto)
-  correlationMatrix: CorrelationMatrixDto;
+  correlationMatrix: CorrelationMatrixDto = new CorrelationMatrixDto();
 
   @ApiProperty({
     description: 'Allocation chart data',
@@ -229,5 +229,5 @@ export class MetricsResponseDto {
   })
   @ValidateNested()
   @Type(() => AllocationChartDto)
-  allocationChart: AllocationChartDto;
+  allocationChart: AllocationChartDto = new AllocationChartDto();
 }

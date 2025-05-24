@@ -17,7 +17,7 @@ export class StrategyRegistryService implements OnModuleInit {
     private poolRepository: Repository<Pool>,
     @InjectRepository(StrategyExecution)
     private strategyExecutionRepository: Repository<StrategyExecution>,
-    // Keep contractService for future use
+    // @ts-ignore - Keep contractService for future use
     private readonly contractService: ContractService,
     private transactionService: TransactionService,
     private eventListenerService: EventListenerService,

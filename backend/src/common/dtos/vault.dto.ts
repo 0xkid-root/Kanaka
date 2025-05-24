@@ -8,7 +8,7 @@ export class DepositDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Amount to deposit (in wei)',
@@ -16,7 +16,7 @@ export class DepositDto {
   })
   @IsString()
   @IsNotEmpty()
-  amount: string;
+  amount: string = '0';
 }
 
 export class WithdrawDto {
@@ -26,7 +26,7 @@ export class WithdrawDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Amount to withdraw (in wei)',
@@ -34,7 +34,7 @@ export class WithdrawDto {
   })
   @IsString()
   @IsNotEmpty()
-  amount: string;
+  amount: string = '0';
 }
 
 export class AddPoolDto {
@@ -44,7 +44,7 @@ export class AddPoolDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Token contract address',
@@ -53,7 +53,7 @@ export class AddPoolDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  token: string;
+  token: string = '';
 }
 
 export class PoolBalanceDto {
@@ -63,7 +63,7 @@ export class PoolBalanceDto {
   })
   @IsString()
   @IsNotEmpty()
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'User balance in the pool',
@@ -71,7 +71,7 @@ export class PoolBalanceDto {
   })
   @IsString()
   @IsNotEmpty()
-  balance: string;
+  balance: string = '0';
 
   @ApiProperty({
     description: 'Total supply of the pool',
@@ -79,7 +79,7 @@ export class PoolBalanceDto {
   })
   @IsString()
   @IsNotEmpty()
-  totalSupply: string;
+  totalSupply: string = '0';
 
   @ApiProperty({
     description: 'Token contract address',
@@ -88,7 +88,7 @@ export class PoolBalanceDto {
   @IsString()
   @IsEthereumAddress()
   @IsNotEmpty()
-  token: string;
+  token: string = '';
 }
 
 export class PoolResponseDto {
@@ -96,74 +96,74 @@ export class PoolResponseDto {
     description: 'Pool ID',
     example: 'pool-1'
   })
-  poolId: string;
+  poolId: string = '';
 
   @ApiProperty({
     description: 'Token contract address',
     example: '0x1234567890abcdef1234567890abcdef12345678'
   })
-  token: string;
+  token: string = '';
 
   @ApiProperty({
     description: 'Total supply of the pool',
     example: '10000000000000000000'
   })
-  totalSupply: string;
+  totalSupply: string = '0';
 
   @ApiProperty({
     description: 'Current APY of the pool',
     example: '5.2'
   })
-  apy: number;
+  apy: number = 0;
 
   @ApiProperty({
     description: 'Whether the pool is active',
     example: true
   })
-  active: boolean;
+  active: boolean = true;
 }
 
 export class VaultPerformanceDto {
   @ApiProperty({ description: 'Vault identifier' })
   @IsString()
   @IsNotEmpty()
-  vaultId: string;
+  vaultId: string = '';
 
   @ApiProperty({ description: 'Total value locked in the vault' })
   @IsNumber()
   @IsPositive()
-  tvl: number;
+  tvl: number = 0;
 
   @ApiProperty({ description: 'Current APY' })
   @IsNumber()
-  apy: number;
+  apy: number = 0;
 
   @ApiProperty({ description: 'Daily yield' })
   @IsNumber()
-  dailyYield: number;
+  dailyYield: number = 0;
 
   @ApiProperty({ description: 'Weekly yield' })
   @IsNumber()
-  weeklyYield: number;
+  weeklyYield: number = 0;
 
   @ApiProperty({ description: 'Monthly yield' })
   @IsNumber()
-  monthlyYield: number;
+  monthlyYield: number = 0;
 
   @ApiProperty({ description: 'Total fees generated' })
   @IsNumber()
   @IsPositive()
-  totalFees: number;
+  totalFees: number = 0;
 
   @ApiProperty({ description: 'Current strategy allocation' })
   @IsString()
-  currentStrategy: string;
+  currentStrategy: string = '';
 
   @ApiProperty({ description: 'Performance score (0-100)' })
   @IsNumber()
   @Min(0)
-  performanceScore: number;
+  performanceScore: number = 0;
 
   @ApiProperty({ description: 'Last rebalance timestamp' })
-  lastRebalanced: Date;
+  lastRebalanced: Date = new Date();
 }

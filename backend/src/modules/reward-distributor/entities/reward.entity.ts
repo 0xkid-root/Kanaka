@@ -3,35 +3,35 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeor
 @Entity('rewards')
 export class Reward {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  user: string;
+  user: string = '';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  amount: string;
+  amount: string = '0';
 
   @Column()
-  reason: string;
+  reason: string = '';
 
   @Column({ default: false })
-  claimed: boolean;
+  claimed: boolean = false;
 
   @CreateDateColumn()
-  timestamp: Date;
+  timestamp: Date = new Date();
 }
 
 @Entity('authorized_distributors')
 export class AuthorizedDistributor {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  address: string;
+  address: string = '';
 
   @Column({ default: true })
-  authorized: boolean;
+  authorized: boolean = true;
 
   @CreateDateColumn()
-  timestamp: Date;
+  timestamp: Date = new Date();
 }

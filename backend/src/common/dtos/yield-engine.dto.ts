@@ -11,7 +11,7 @@ export class RebalanceDto {
   @ArrayMinSize(1)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
-  newWeights: string[];
+  newWeights: string[] = [];
 }
 
 export class HarvestYieldDto {
@@ -21,7 +21,7 @@ export class HarvestYieldDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  poolId: number;
+  poolId: number = 0;
 }
 
 export class PoolDepositDto {
@@ -31,7 +31,7 @@ export class PoolDepositDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  poolId: number;
+  poolId: number = 0;
 
   @ApiProperty({
     description: 'Amount to deposit',
@@ -39,7 +39,7 @@ export class PoolDepositDto {
   })
   @IsString()
   @IsNotEmpty()
-  amount: string;
+  amount: string = '';
 }
 
 export class PoolWithdrawalDto {
@@ -49,7 +49,7 @@ export class PoolWithdrawalDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  poolId: number;
+  poolId: number = 0;
 
   @ApiProperty({
     description: 'Amount to withdraw',
@@ -57,5 +57,5 @@ export class PoolWithdrawalDto {
   })
   @IsString()
   @IsNotEmpty()
-  amount: string;
+  amount: string = '';
 }

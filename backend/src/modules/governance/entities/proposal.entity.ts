@@ -3,41 +3,41 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 @Entity('proposals')
 export class Proposal {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column({ default: 'Untitled Proposal' })
-  title: string;
+  title: string = 'Untitled Proposal';
 
   @Column('text')
-  description: string;
+  description: string = '';
 
   @Column()
-  proposer: string;
+  proposer: string = '';
 
   @Column({ type: 'bigint' })
-  startTime: number;
+  startTime: number = 0;
 
   @Column({ type: 'bigint' })
-  endTime: number;
+  endTime: number = 0;
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  forVotes: string;
+  forVotes: string = '0';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  againstVotes: string;
+  againstVotes: string = '0';
 
   @Column({ default: false })
-  executed: boolean;
+  executed: boolean = false;
 
   @Column({ default: false })
-  canceled: boolean;
+  canceled: boolean = false;
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  quorum: string;
+  quorum: string = '0';
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

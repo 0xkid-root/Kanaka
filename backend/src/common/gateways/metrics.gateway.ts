@@ -22,7 +22,7 @@ import { ProposalUpdateDto } from '../dtos/proposal.dto';
 })
 export class MetricsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   private connectedClients: Map<string, Socket> = new Map();
   private readonly roomTypes = ['pool', 'vault', 'strategy', 'proposal'] as const;
@@ -112,7 +112,6 @@ export class MetricsGateway implements OnGatewayConnection, OnGatewayDisconnect 
       type: 'pool',
       timestamp: new Date().toISOString(),
       data: {
-        poolId,
         ...data
       }
     });

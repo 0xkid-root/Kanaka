@@ -3,29 +3,29 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 @Entity('forum_posts')
 export class ForumPost {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  userId: number;
+  userId: number = 0;
 
   @Column()
-  title: string;
+  title: string = '';
 
   @Column('text')
-  content: string;
+  content: string = '';
 
   @Column()
-  ipfsHash: string;
+  ipfsHash: string = '';
 
   @Column({ default: 0 })
-  upvotes: number;
+  upvotes: number = 0;
 
   @Column({ default: 0 })
-  downvotes: number;
+  downvotes: number = 0;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

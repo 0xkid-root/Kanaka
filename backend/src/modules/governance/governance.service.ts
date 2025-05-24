@@ -122,7 +122,7 @@ export class GovernanceService implements OnModuleInit {
             voter: event.voter,
             weight: event.votes.toString(),
             vote: event.support ? 'yes' : 'no',
-            reason: event.reason || null,
+            reason: event.reason || '',
           });
           
           await this.voteRepository.save(vote);
@@ -552,4 +552,6 @@ export class GovernanceService implements OnModuleInit {
         this.logger.error(`Failed to get proposal threshold: ${error.message}`, error.stack);
         throw error;
       } else {
-        this.logger.error(`Failed to get proposal threshold
+        this.logger.error(`Failed to get proposal threshold: ${String(error)}`);
+        throw new Error(`Failed to get proposal threshold: ${String(error)}`);
+      }

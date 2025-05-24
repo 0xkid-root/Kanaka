@@ -5,7 +5,6 @@ import {
   HttpException,
   HttpStatus,
   Inject,
-  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { AppLoggerService } from '../services/logging.service';

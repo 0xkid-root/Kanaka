@@ -93,7 +93,8 @@ export class SensitiveDataFilter {
     
     // Apply all regex patterns
     for (const [key, pattern] of Object.entries(this.patterns)) {
-      result = result.replace(pattern, this.replacements[key]);
+      const replacement = this.replacements[key] || '***';
+      result = result.replace(pattern, replacement);
     }
     
     return result;

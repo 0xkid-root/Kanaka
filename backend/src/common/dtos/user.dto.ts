@@ -56,7 +56,7 @@ export class WalletAuthDto {
   })
   @IsEthereumAddress()
   @IsNotEmpty()
-  address: string;
+  address: string = '';
 
   @ApiProperty({
     description: 'Signature created by signing the message with the private key',
@@ -64,7 +64,7 @@ export class WalletAuthDto {
   })
   @IsString()
   @IsNotEmpty()
-  signature: string;
+  signature: string = '';
 
   @ApiProperty({
     description: 'Message that was signed',
@@ -72,7 +72,7 @@ export class WalletAuthDto {
   })
   @IsString()
   @IsNotEmpty()
-  message: string;
+  message: string = '';
 }
 
 export class SocialAuthDto {
@@ -82,7 +82,7 @@ export class SocialAuthDto {
   })
   @IsString()
   @IsNotEmpty()
-  oauthToken: string;
+  oauthToken: string = '';
 
   @ApiProperty({
     description: 'Social platform',
@@ -91,7 +91,7 @@ export class SocialAuthDto {
   })
   @IsEnum(['twitter', 'discord'])
   @IsNotEmpty()
-  platform: 'twitter' | 'discord';
+  platform: 'twitter' | 'discord' = 'twitter';
 }
 
 export class UserProfileResponseDto {
@@ -99,19 +99,19 @@ export class UserProfileResponseDto {
     description: 'User ID',
     example: 1
   })
-  id: number;
+  id: number = 0;
 
   @ApiProperty({
     description: 'Ethereum wallet address',
     example: '0x1234567890abcdef1234567890abcdef12345678'
   })
-  walletAddress: string;
+  walletAddress: string = '';
 
   @ApiProperty({
     description: 'KNT token balance',
     example: 1000.5
   })
-  kntBalance: number;
+  kntBalance: number = 0;
 
   @ApiProperty({
     description: 'Twitter ID if connected',
@@ -119,7 +119,7 @@ export class UserProfileResponseDto {
     required: false
   })
   @IsOptional()
-  twitterId?: string;
+  twitterId?: string = '';
 
   @ApiProperty({
     description: 'Discord ID if connected',
@@ -127,19 +127,19 @@ export class UserProfileResponseDto {
     required: false
   })
   @IsOptional()
-  discordId?: string;
+  discordId?: string = '';
 
   @ApiProperty({
     description: 'User creation timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @ApiProperty({
     description: 'User last update timestamp',
     example: '2025-05-23T02:10:26+05:30'
   })
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }
 
 export class AuthResponseDto {
@@ -147,12 +147,12 @@ export class AuthResponseDto {
     description: 'JWT access token',
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
   })
-  accessToken: string;
+  accessToken: string = '';
 
   @ApiProperty({
     description: 'User profile information'
   })
-  user: UserProfileResponseDto;
+  user: UserProfileResponseDto = new UserProfileResponseDto();
 }
 
 export class UpdateRolesDto {

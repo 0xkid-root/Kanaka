@@ -72,12 +72,12 @@ export class GovernanceController {
   ) {
     try {
       return await this.governanceService.getProposals(active, limit, offset);
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch proposals',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -110,7 +110,7 @@ export class GovernanceController {
         );
       }
       return proposal;
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
       }
@@ -118,7 +118,7 @@ export class GovernanceController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch proposal',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -162,7 +162,7 @@ export class GovernanceController {
       }
       
       return await this.governanceService.getVotes(id, support);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
       }
@@ -170,7 +170,7 @@ export class GovernanceController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to fetch votes',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -201,12 +201,12 @@ export class GovernanceController {
   ) {
     try {
       return await this.governanceService.createProposal(dto, req.user.privateKey);
-    } catch (error) {
+    } catch (error: any) {
       throw new HttpException(
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to create proposal',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -269,7 +269,7 @@ export class GovernanceController {
       }
       
       return await this.governanceService.castVote(id, dto.support, req.user.privateKey, dto.reason);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
       }
@@ -277,7 +277,7 @@ export class GovernanceController {
         {
           status: HttpStatus.BAD_REQUEST,
           error: 'Failed to cast vote',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -363,7 +363,7 @@ export class GovernanceController {
       }
       
       return await this.governanceService.executeProposal(id, req.user.privateKey);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
       }
@@ -371,7 +371,7 @@ export class GovernanceController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to execute proposal',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
@@ -445,7 +445,7 @@ export class GovernanceController {
       }
       
       return await this.governanceService.cancelProposal(id, req.user.privateKey);
-    } catch (error) {
+    } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
       }
@@ -453,7 +453,7 @@ export class GovernanceController {
         {
           status: HttpStatus.INTERNAL_SERVER_ERROR,
           error: 'Failed to cancel proposal',
-          message: error.message,
+          message: error?.message || 'Unknown error',
         },
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
