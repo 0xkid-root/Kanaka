@@ -3,23 +3,23 @@ import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } fro
 @Entity('pool_metrics')
 export class PoolMetrics {
   @PrimaryColumn()
-  poolId: string;
+  poolId: string = '';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  tvl: string;
+  tvl: string = '0';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  volatility: string;
+  volatility: string = '0';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  yieldRate: string;
+  yieldRate: string = '0';
 
   @Column({ type: 'bigint' })
-  lastUpdate: number;
+  lastUpdate: number = 0;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

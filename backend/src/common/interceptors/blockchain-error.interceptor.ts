@@ -3,11 +3,10 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  HttpException,
 } from '@nestjs/common';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { ErrorHandlerService, BlockchainError } from '../services/error-handler.service';
+import { ErrorHandlerService } from '../services/error-handler.service';
 import { AppLoggerService } from '../services/logging.service';
 
 /**
@@ -28,7 +27,7 @@ export class BlockchainErrorInterceptor implements NestInterceptor {
     return next.handle().pipe(
       catchError(error => {
         // Check if this is already a blockchain error
-        if (error instanceof BlockchainError || (error.type && error.message)) {
+        if (error.type && error.message) {
           this.logger.debug(`Converting blockchain error to HTTP exception: ${error.type}`);
           
           // Convert to HTTP exception
@@ -52,7 +51,7 @@ export class BlockchainErrorInterceptor implements NestInterceptor {
             return throwError(() => httpException);
           } catch (conversionError) {
             // If conversion fails, pass through the original error
-            this.logger.debug(`Error conversion failed: ${conversionError.message}`);
+            this.logger.debug(`Error conversion failed: ${conversionError instanceof Error ? conversionError instanceof Error ? conversionError.message : String(conversionError) : String(conversionError)}`);
           }
         }
         

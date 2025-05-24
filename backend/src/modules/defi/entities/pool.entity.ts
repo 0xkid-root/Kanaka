@@ -4,41 +4,41 @@ import { Transaction } from './transaction.entity';
 @Entity('pools')
 export class Pool {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column({ unique: true })
-  name: string;
+  name: string = '';
 
   @Column()
-  token: string;
+  token: string = '';
 
   @Column()
-  strategy: string;
+  strategy: string = '';
 
   @Column({ type: 'varchar' })
-  totalValue: string;
+  totalValue: string = '0';
 
   @Column({ type: 'varchar' })
-  minDeposit: string;
+  minDeposit: string = '0';
 
   @Column({ type: 'varchar' })
-  maxCapacity: string;
+  maxCapacity: string = '0';
 
   @Column({ type: 'float', default: 0 })
-  currentYield: number;
+  currentYield: number = 0;
 
   @Column({ type: 'float', default: 0 })
-  volatility: number;
+  volatility: number = 0;
 
   @Column({ type: 'float', default: 0 })
-  weight: number;
+  weight: number = 0;
 
-  @OneToMany(() => Transaction, transaction => transaction.pool)
-  transactions: Transaction[];
+  @OneToMany(() => Transaction, (transaction: any) => transaction.poolId)
+  transactions: Transaction[] = [];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

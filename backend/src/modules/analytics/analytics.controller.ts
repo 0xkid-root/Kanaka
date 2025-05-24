@@ -76,7 +76,12 @@ export class AnalyticsController {
     @Param('id') poolId: number,
     @Body() metricsDto: UpdateMetricsDto,
   ): Promise<Metric> {
-    return await this.analyticsService.updateMetrics(poolId, metricsDto);
+    // Extract the first metric from the DTO
+    if (metricsDto.metrics && metricsDto.metrics.length > 0) {
+      const metric = metricsDto.metrics[0];
+      return await this.analyticsService.updateMetrics(poolId, metric);
+    }
+    throw new Error('No metrics provided');
   }
 
   @Post('correlations')
@@ -90,7 +95,7 @@ export class AnalyticsController {
   async updateCorrelations(
     @Body() correlationsDto: UpdateCorrelationsDto,
   ): Promise<Correlation> {
-    return await this.analyticsService.updateCorrelations(correlationsDto.matrix);
+    return await this.analyticsService.updateCorrelations(correlationsDto.matrix || []);
   }
 
   @Post('pools/:id/cdr')
@@ -106,6 +111,11 @@ export class AnalyticsController {
     @Param('id') poolId: number,
     @Body() cdrDto: UpdateCDRDto,
   ): Promise<CDR> {
-    return await this.analyticsService.updateCDR(poolId, cdrDto);
+    // Extract the first CDR from the DTO
+    if (cdrDto.cdrs && cdrDto.cdrs.length > 0) {
+      const cdr = cdrDto.cdrs[0];
+      return await this.analyticsService.updateCDR(poolId, cdr);
+    }
+    throw new Error('No CDR data provided');
   }
 }

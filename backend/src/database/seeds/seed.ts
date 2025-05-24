@@ -13,12 +13,12 @@ const configService = new ConfigService();
 // Database configuration
 const isProduction = configService.get('NODE_ENV') === 'production';
 const dataSource = new DataSource({
-  type: isProduction ? 'postgres' : 'sqlite',
-  host: isProduction ? configService.get('DATABASE_HOST') : undefined,
-  port: isProduction ? parseInt(configService.get('DATABASE_PORT'), 10) : undefined,
-  username: isProduction ? configService.get('DATABASE_USERNAME') : undefined,
-  password: isProduction ? configService.get('DATABASE_PASSWORD') : undefined,
-  database: isProduction ? configService.get('DATABASE_NAME') : configService.get('DATABASE_PATH', 'kanaka.db'),
+  type: 'postgres',
+  host: configService.get('DATABASE_HOST') || 'localhost',
+  port: parseInt(configService.get('DATABASE_PORT') || '5432', 10),
+  username: configService.get('DATABASE_USERNAME') || 'postgres',
+  password: configService.get('DATABASE_PASSWORD') || 'postgres',
+  database: configService.get('DATABASE_NAME') || 'kanaka',
   entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
   synchronize: false,
 });

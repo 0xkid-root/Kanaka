@@ -122,7 +122,6 @@ export class MetricsGateway implements OnGatewayConnection, OnGatewayDisconnect 
       type: 'vault',
       timestamp: new Date().toISOString(),
       data: {
-        vaultId,
         ...data
       }
     });
@@ -133,7 +132,6 @@ export class MetricsGateway implements OnGatewayConnection, OnGatewayDisconnect 
       type: 'strategy',
       timestamp: new Date().toISOString(),
       data: {
-        strategyId,
         ...data
       }
     });
@@ -144,7 +142,6 @@ export class MetricsGateway implements OnGatewayConnection, OnGatewayDisconnect 
       type: 'proposal',
       timestamp: new Date().toISOString(),
       data: {
-        proposalId,
         ...data
       }
     });

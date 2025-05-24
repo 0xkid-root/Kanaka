@@ -12,7 +12,7 @@ import { AppConfigService } from './common/services/config.service';
 import { SensitiveDataFilter } from './common/filters/sensitive-data.filter';
 import { ErrorHandlerService } from './common/services/error-handler.service';
 import * as compression from 'compression';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
 
 async function bootstrap() {
   // Create the application
@@ -30,10 +30,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   
   // Enable security features
-  app.use(helmet({
-    contentSecurityPolicy: configService.nodeEnv === 'production' ? undefined : false,
-    crossOriginEmbedderPolicy: configService.nodeEnv === 'production',
-  }));
+  app.use(helmet());
   app.use(compression());
   
   // Enable validation pipes globally

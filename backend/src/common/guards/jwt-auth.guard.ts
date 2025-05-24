@@ -17,7 +17,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   /**
    * Handle unauthorized errors
    */
-  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+  override handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
     if (err || !user) {
       const request = context.switchToHttp().getRequest();
       const path = request ? `${request.method} ${request.url}` : 'unknown';

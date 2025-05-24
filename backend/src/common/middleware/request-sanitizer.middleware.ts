@@ -17,7 +17,7 @@ export class RequestSanitizerMiddleware implements NestMiddleware {
   /**
    * Sanitize request body, query, and params
    */
-  use(req: Request, res: Response, next: NextFunction) {
+  use(req: Request, _res: Response, next: NextFunction) {
     // Sanitize request body
     if (req.body) {
       req.body = this.sanitizeObject(req.body);
@@ -53,7 +53,7 @@ export class RequestSanitizerMiddleware implements NestMiddleware {
 
     // Handle objects
     if (typeof obj === 'object') {
-      const sanitized = {};
+      const sanitized: Record<string, any> = {};
       for (const key of Object.keys(obj)) {
         // Skip sanitizing certain fields like passwords, hashes, etc.
         if (this.shouldSkipSanitization(key)) {

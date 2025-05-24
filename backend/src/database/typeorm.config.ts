@@ -11,12 +11,12 @@ const isProduction = configService.get('NODE_ENV') === 'production';
 
 // Database configuration for migrations
 export default new DataSource({
-  type: isProduction ? 'postgres' : 'sqlite',
-  host: isProduction ? configService.get('DATABASE_HOST') : undefined,
-  port: isProduction ? parseInt(configService.get('DATABASE_PORT'), 10) : undefined,
-  username: isProduction ? configService.get('DATABASE_USERNAME') : undefined,
-  password: isProduction ? configService.get('DATABASE_PASSWORD') : undefined,
-  database: isProduction ? configService.get('DATABASE_NAME') : configService.get('DATABASE_PATH', 'kanaka.db'),
+  type: 'postgres',
+  host: configService.get('DATABASE_HOST') || 'localhost',
+  port: parseInt(configService.get('DATABASE_PORT') || '5432', 10),
+  username: configService.get('DATABASE_USERNAME') || 'postgres',
+  password: configService.get('DATABASE_PASSWORD') || 'postgres',
+  database: configService.get('DATABASE_NAME') || 'kanaka',
   entities: [join(__dirname, '..', '**', '*.entity{.ts,.js}')],
   migrations: [join(__dirname, 'migrations', '*{.ts,.js}')],
   ssl: isProduction && configService.get('DATABASE_SSL') === 'true' ? {

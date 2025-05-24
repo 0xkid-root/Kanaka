@@ -34,13 +34,10 @@ export class LoggingInterceptor implements NestInterceptor {
     const filteredQuery = this.sensitiveDataFilter.filterObject(request.query);
     
     // Log the request
-    this.logger.debug(`Request: ${method} ${url}`, {
-      ip: this.sensitiveDataFilter.filterString(ip),
-      userAgent,
-      body: filteredBody,
-      query: filteredQuery,
-      headers: this.filterHeaders(request.headers),
-    });
+    this.logger.debug(`Request: ${method} ${url} from ${this.sensitiveDataFilter.filterString(ip || 'unknown')} with ${userAgent}`);
+    this.logger.debug(`Request body: ${JSON.stringify(filteredBody)}`);
+    this.logger.debug(`Request query: ${JSON.stringify(filteredQuery)}`);
+    this.logger.debug(`Request headers: ${JSON.stringify(this.filterHeaders(request.headers))}`);
 
     return next.handle().pipe(
       tap({
@@ -53,15 +50,12 @@ export class LoggingInterceptor implements NestInterceptor {
           const filteredData = this.sensitiveDataFilter.filterObject(data);
 
           this.logger.log(
-            `${method} ${url} ${statusCode} ${responseTime}ms - ${this.sensitiveDataFilter.filterString(ip)} - ${userAgent}`,
+            `${method} ${url} ${statusCode} ${responseTime}ms - ${this.sensitiveDataFilter.filterString(ip || 'unknown')} - ${userAgent}`,
           );
           
           // Log detailed response for debugging
           if (process.env.NODE_ENV !== 'production') {
-            this.logger.debug(`Response: ${statusCode}`, {
-              responseTime,
-              body: filteredData,
-            });
+            this.logger.debug(`Response: ${statusCode} - responseTime: ${responseTime}ms - body: ${JSON.stringify(filteredData)}`);
           }
         },
         error: (error) => {
@@ -73,7 +67,7 @@ export class LoggingInterceptor implements NestInterceptor {
           const filteredError = this.sensitiveDataFilter.filterError(error);
 
           this.logger.error(
-            `${method} ${url} ${statusCode} ${responseTime}ms - ${this.sensitiveDataFilter.filterString(ip)} - ${userAgent} - ${filteredError.message}`,
+            `${method} ${url} ${statusCode} ${responseTime}ms - ${this.sensitiveDataFilter.filterString(ip || 'unknown')} - ${userAgent} - ${filteredError.message}`,
             filteredError.stack,
           );
         }

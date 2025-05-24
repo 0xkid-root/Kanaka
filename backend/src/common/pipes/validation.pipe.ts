@@ -66,12 +66,12 @@ export class CustomValidationPipe implements PipeTransform<any> {
           ? this.sensitiveDataFilter.filterObject(value)
           : value;
           
-        this.logger.debug(`Validation failed for ${metatype.name}`, {
+        this.logger.debug(`Validation failed for ${metatype.name}: ${JSON.stringify({
           value: filteredValue,
           errors: formattedErrors,
           type,
           data,
-        });
+        })}`);
       }
       
       throw new BadRequestException({
@@ -90,8 +90,8 @@ export class CustomValidationPipe implements PipeTransform<any> {
     return !types.includes(metatype);
   }
 
-  private formatErrors(errors: ValidationError[]) {
-    return errors.reduce((acc, error) => {
+  private formatErrors(errors: ValidationError[]): Record<string, string> {
+    return errors.reduce((acc: Record<string, string>, error) => {
       const constraints = error.constraints || {};
       const messages = Object.values(constraints);
       
@@ -107,6 +107,6 @@ export class CustomValidationPipe implements PipeTransform<any> {
       }
       
       return acc;
-    }, {});
+    }, {} as Record<string, string>);
   }
 }

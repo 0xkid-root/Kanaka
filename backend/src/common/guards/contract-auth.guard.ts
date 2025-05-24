@@ -54,8 +54,8 @@ export class ContractAuthGuard implements CanActivate {
     const adminAddressesStr = this.configService.get('ADMIN_ADDRESSES', '');
     this.adminAddresses = adminAddressesStr
       .split(',')
-      .map(addr => addr.trim().toLowerCase())
-      .filter(addr => addr.length > 0 && ethers.utils.isAddress(addr));
+      .map((addr: string) => addr.trim().toLowerCase())
+      .filter((addr: string) => addr.length > 0 && ethers.utils.isAddress(addr));
     
     if (this.adminAddresses.length === 0) {
       this.logger.warn('No admin addresses configured. Contract actions may be unrestricted.');
@@ -94,7 +94,8 @@ export class ContractAuthGuard implements CanActivate {
     
     // Check if the circuit breaker is tripped for this contract
     const circuitBreakerKey = `contract:${contractAction.contract}`;
-    if (this.circuitBreaker.isTripped(circuitBreakerKey)) {
+    const circuitState = this.circuitBreaker.getCircuitState(circuitBreakerKey);
+    if (circuitState === 'OPEN') {
       this.logger.warn(`Circuit breaker tripped for ${contractAction.contract}`);
       throw new ForbiddenException(`Operations for ${contractAction.contract} are temporarily disabled`);
     }
@@ -128,16 +129,16 @@ export class ContractAuthGuard implements CanActivate {
       // Use circuit breaker pattern for contract calls
       const circuitBreakerKey = `contract:${contractAction.contract}:${contractAction.action}`;
       
-      return await this.circuitBreaker.executeWithCircuitBreaker(
+      return await this.circuitBreaker.execute(
         circuitBreakerKey,
         async () => {
           // This is where we would check on-chain permissions
           // For example, checking if the user has a specific role in the contract
-          const contract = this.contractService.getContract(contractAction.contract);
+          const contract = await this.contractService.getContract(contractAction.contract);
           
           // Example: Check if the user has the required role in the contract
           // This is just an example and should be adapted to your specific contract
-          if (contract.hasFunction('hasRole')) {
+          if (contract.interface && contract.interface.hasFunction && contract.interface.hasFunction('hasRole')) {
             const actionRole = ethers.utils.keccak256(
               ethers.utils.toUtf8Bytes(`ROLE_${contractAction.action.toUpperCase()}`)
             );
@@ -151,7 +152,7 @@ export class ContractAuthGuard implements CanActivate {
           }
           
           // Example: Check if the user is an owner
-          if (contract.hasFunction('owner')) {
+          if (contract.interface && contract.interface.hasFunction && contract.interface.hasFunction('owner')) {
             const owner = await contract.owner();
             
             if (owner.toLowerCase() === userAddress) {
@@ -161,7 +162,7 @@ export class ContractAuthGuard implements CanActivate {
           }
           
           // Check if the user has permission for this specific action
-          if (contract.hasFunction('canPerformAction')) {
+          if (contract.interface && contract.interface.hasFunction && contract.interface.hasFunction('canPerformAction')) {
             const canPerform = await contract.canPerformAction(userAddress, contractAction.action);
             
             if (canPerform) {
@@ -173,7 +174,10 @@ export class ContractAuthGuard implements CanActivate {
           this.logger.warn(`User ${userAddress} not authorized for ${contractAction.contract}.${contractAction.action}`);
           throw new ForbiddenException('You are not authorized to perform this action');
         },
-        (error) => {
+        {
+          failureTypes: [Error, ForbiddenException]
+        }
+      ).catch((error: any) => {
           if (error instanceof ForbiddenException) {
             throw error;
           }
@@ -196,10 +200,10 @@ export class ContractAuthGuard implements CanActivate {
       }
       
       const filteredMessage = this.sensitiveDataFilter
-        ? this.sensitiveDataFilter.filterString(error.message)
-        : error.message;
+        ? this.sensitiveDataFilter.filterString(error instanceof Error ? error.message : String(error))
+        : (error instanceof Error ? error.message : String(error));
         
-      this.logger.error(`Unexpected error in contract auth: ${filteredMessage}`, error.stack);
+      this.logger.error(`Unexpected error in contract auth: ${filteredMessage}`, error instanceof Error ? error.stack : undefined);
       throw new UnauthorizedException('Error checking permissions');
     }
   }

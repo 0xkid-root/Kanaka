@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { RateLimiterService, RateLimitOptions } from '../services/rate-limiter.service';
+import { RateLimiterService } from '../services/rate-limiter.service';
+import { RateLimitOptions } from '../types/rate-limit.types';
 import { AppLoggerService } from '../services/logging.service';
 import { Request } from 'express';
 
@@ -47,13 +48,13 @@ export class RateLimitGuard implements CanActivate {
     const key = this.getRateLimitKey(request);
     
     // Check the rate limit
-    const result = await this.rateLimiterService.checkRateLimit(key, options);
+    const result = await this.rateLimiterService.checkRateLimit(key, options as Partial<RateLimitOptions>);
     
     // Set rate limit headers
     const response = context.switchToHttp().getResponse();
-    response.header('X-RateLimit-Limit', result.limit.toString());
+    response.header('X-RateLimit-Limit', options.points?.toString() || '100');
     response.header('X-RateLimit-Remaining', result.remaining.toString());
-    response.header('X-RateLimit-Reset', result.resetSecs.toString());
+    response.header('X-RateLimit-Reset', result.resetTime.toString());
     
     // If the rate limit has been exceeded, throw an exception
     if (!result.allowed) {
@@ -63,7 +64,7 @@ export class RateLimitGuard implements CanActivate {
         statusCode: HttpStatus.TOO_MANY_REQUESTS,
         error: 'Too Many Requests',
         message: 'Rate limit exceeded. Please try again later.',
-        retryAfter: result.resetSecs,
+        retryAfter: result.resetTime,
       }, HttpStatus.TOO_MANY_REQUESTS);
     }
     
@@ -77,8 +78,8 @@ export class RateLimitGuard implements CanActivate {
    */
   private getRateLimitKey(request: Request): string {
     // If the user is authenticated, use their ID
-    if (request.user && request.user.id) {
-      return `user:${request.user.id}`;
+    if (request.user && (request.user as any).id) {
+      return `user:${(request.user as any).id}`;
     }
     
     // Otherwise, use the IP address

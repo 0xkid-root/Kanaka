@@ -3,8 +3,8 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
-  Reflector,
 } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 

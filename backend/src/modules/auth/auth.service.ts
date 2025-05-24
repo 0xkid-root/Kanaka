@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../user/entities/user.entity';
+import { User, WalletType } from '../user/entities/user.entity';
 import { SignatureService } from '../../common/services/signature.service';
 import { AppLoggerService } from '../../common/services/logging.service';
 import { RedisService } from '../../common/services/redis.service';
@@ -40,7 +40,7 @@ export class AuthService {
       
       // Find the user
       let user = await this.userRepository.findOne({ 
-        where: { address: normalizedAddress } 
+        where: { walletAddress: normalizedAddress } 
       });
       
       // If the user doesn't exist, create a new one
@@ -48,7 +48,8 @@ export class AuthService {
         this.logger.log(`Creating new user for address: ${normalizedAddress}`);
         
         user = this.userRepository.create({
-          address: normalizedAddress,
+          walletAddress: normalizedAddress,
+          walletType: WalletType.ETHEREUM,
           nonce: this.signatureService.generateNonce(),
         });
         
@@ -77,9 +78,10 @@ export class AuthService {
       await this.userRepository.save(user);
       
       return user.nonce;
-    } catch (error) {
-      this.logger.error(`Error generating nonce: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error generating nonce: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
@@ -96,9 +98,10 @@ export class AuthService {
       const message = this.signatureService.generateAuthMessage(user.nonce);
       
       return { message, nonce: user.nonce };
-    } catch (error) {
-      this.logger.error(`Error generating auth message: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error generating auth message: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
@@ -129,7 +132,7 @@ export class AuthService {
         
         user = this.userRepository.create({
           walletAddress: normalizedAddress,
-          walletType: walletType,
+          walletType: walletType as WalletType,
           nonce: this.signatureService.generateNonce(),
           roles: ['user'],
         });
@@ -185,12 +188,13 @@ export class AuthService {
           roles: user.roles,
         }
       };
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
       
-      this.logger.error(`Error verifying signature: ${error.message}`, error.stack);
+      const err = error as Error;
+      this.logger.error(`Error verifying signature: ${err.message}`, err.stack);
       throw new UnauthorizedException('Authentication failed');
     }
   }
@@ -210,8 +214,7 @@ export class AuthService {
     try {
       // Find the user
       const user = await this.userRepository.findOne({ 
-        where: { id: userId },
-        relations: ['roles'],
+        where: { id: Number(userId) }
       });
       
       if (!user) {
@@ -229,19 +232,20 @@ export class AuthService {
       
       await this.redisService.setJson(`apikey:${apiKey}`, {
         userId: user.id,
-        address: user.address,
+        walletAddress: user.walletAddress,
         name,
         roles,
         createdAt: new Date(),
         expiresAt,
       }, expiresIn);
       
-      this.logger.log(`API key generated for user ${user.address}: ${name}`);
+      this.logger.log(`API key generated for user ${user.walletAddress}: ${name}`);
       
       return { apiKey, expiresAt };
-    } catch (error) {
-      this.logger.error(`Error generating API key: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error generating API key: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
@@ -255,9 +259,10 @@ export class AuthService {
       await this.redisService.del(`apikey:${apiKey}`);
       
       this.logger.log(`API key revoked: ${apiKey}`);
-    } catch (error) {
-      this.logger.error(`Error revoking API key: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error revoking API key: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
@@ -270,7 +275,7 @@ export class AuthService {
     try {
       // Find the user
       const user = await this.userRepository.findOne({ 
-        where: { id: userId } 
+        where: { id: Number(userId) } 
       });
       
       if (!user) {
@@ -284,23 +289,25 @@ export class AuthService {
       for (const key of keys) {
         const apiKeyData = await this.redisService.getJson(key);
         
-        if (apiKeyData && apiKeyData.userId === userId) {
+        if (apiKeyData && apiKeyData.userId === userId.toString()) {
           // Extract the actual API key from the Redis key
           const apiKey = key.replace('apikey:', '');
           
+          const data = apiKeyData as any;
           apiKeys.push({
             apiKey: apiKey.substring(0, 8) + '...',
-            name: apiKeyData.name,
-            createdAt: apiKeyData.createdAt,
-            expiresAt: apiKeyData.expiresAt,
+            name: data.name || 'Unknown',
+            createdAt: data.createdAt || new Date(),
+            expiresAt: data.expiresAt || new Date(),
           });
         }
       }
       
       return apiKeys;
-    } catch (error) {
-      this.logger.error(`Error listing API keys: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Error listing API keys: ${err.message}`, err.stack);
+      throw err;
     }
   }
 }

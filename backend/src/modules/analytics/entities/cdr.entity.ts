@@ -3,17 +3,17 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('cdrs')
 export class CDR {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @Column({ type: 'float' })
-  value: number;
+  value: number = 0;
 
   @Column({ type: 'float' })
-  portfolioVolatility: number;
+  portfolioVolatility: number = 0;
 
   @Column({ type: 'float' })
-  averageCorrelation: number;
+  averageCorrelation: number = 0;
 }

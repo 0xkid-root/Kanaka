@@ -3,17 +3,17 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 @Entity('correlations')
 export class Correlation {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  poolIdA: number;
+  poolIdA: number = 0;
 
   @Column()
-  poolIdB: number;
+  poolIdB: number = 0;
 
   @Column()
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @Column({ type: 'float' })
-  correlation: number;
+  correlation: number = 0;
 }

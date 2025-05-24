@@ -1,12 +1,12 @@
 import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard as PassportAuthGuard } from '@nestjs/passport';
 import { AppLoggerService } from '../services/logging.service';
 
 /**
  * Combined authentication guard that accepts either JWT or API key
  */
 @Injectable()
-export class AuthGuard extends AuthGuard(['jwt', 'api-key']) {
+export class AuthGuard extends PassportAuthGuard(['jwt', 'api-key']) {
   private readonly logger: AppLoggerService;
 
   constructor(loggerService: AppLoggerService) {
@@ -17,7 +17,7 @@ export class AuthGuard extends AuthGuard(['jwt', 'api-key']) {
   /**
    * Handle unauthorized errors
    */
-  handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+  override handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
     if (err || !user) {
       const request = context.switchToHttp().getRequest();
       const path = request ? `${request.method} ${request.url}` : 'unknown';

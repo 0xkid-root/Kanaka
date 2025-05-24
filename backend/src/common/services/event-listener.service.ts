@@ -10,7 +10,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
   private readonly logger: AppLoggerService;
   private eventEmitter = new EventEmitter();
   private listeners = new Map();
-  private reconnectInterval: NodeJS.Timeout;
+  private reconnectInterval: NodeJS.Timeout = setTimeout(() => {}, 0);
   private isConnected = false;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts: number;
@@ -55,7 +55,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
       // Clear any existing reconnect interval
       if (this.reconnectInterval) {
         clearInterval(this.reconnectInterval);
-        this.reconnectInterval = null;
+        this.reconnectInterval = setTimeout(() => {}, 0);
       }
     } catch (error) {
       this.isConnected = false;
@@ -72,7 +72,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Disconnecting from blockchain events...');
     
     // Remove all listeners
-    this.listeners.forEach((listener, event) => {
+    this.listeners.forEach((_listener, event) => {
       this.removeEventListener(event);
     });
     
@@ -81,7 +81,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
     // Clear any existing reconnect interval
     if (this.reconnectInterval) {
       clearInterval(this.reconnectInterval);
-      this.reconnectInterval = null;
+      this.reconnectInterval = setTimeout(() => {}, 0);
     }
     
     this.logger.log('Disconnected from blockchain events');
@@ -103,7 +103,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
     this.logger.log(`Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
     
     this.reconnectInterval = setTimeout(async () => {
-      this.reconnectInterval = null;
+      this.reconnectInterval = setTimeout(() => {}, 0);
       await this.connect();
     }, delay);
   }
@@ -119,7 +119,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
 
   private async setupPoolEventListeners() {
     try {
-      const poolContract = this.contractService.getPoolContract();
+      const poolContract = this.contractService.getContract('pool');
       
       // Listen for deposit events
       this.addEventListener('PoolDeposit', poolContract, 'Deposit', async (from, amount, timestamp) => {
@@ -138,15 +138,16 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
         this.logger.log(`Rebalance event: ${executor} rebalanced from ${oldWeights} to ${newWeights} at ${timestamp}`);
         this.eventEmitter.emit('PoolRebalance', { executor, oldWeights, newWeights, timestamp });
       });
-    } catch (error) {
-      this.logger.error(`Failed to setup pool event listeners: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Failed to setup pool event listeners: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
   private async setupVaultEventListeners() {
     try {
-      const vaultContract = this.contractService.getVaultContract();
+      const vaultContract = this.contractService.getContract('vault');
       
       // Listen for deposit events
       this.addEventListener('VaultDeposit', vaultContract, 'Deposit', async (user, token, amount, shares) => {
@@ -159,15 +160,16 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
         this.logger.log(`Vault Withdraw event: ${user} withdrew ${amount} of ${token} for ${shares} shares`);
         this.eventEmitter.emit('VaultWithdraw', { user, token, amount, shares });
       });
-    } catch (error) {
-      this.logger.error(`Failed to setup vault event listeners: ${error.message}`, error.stack);
-      throw error;
+    } catch (error: unknown) {
+      const err = error as Error;
+      this.logger.error(`Failed to setup vault event listeners: ${err.message}`, err.stack);
+      throw err;
     }
   }
 
   private async setupGovernanceEventListeners() {
     try {
-      const governanceContract = this.contractService.getGovernanceContract();
+      const governanceContract = this.contractService.getContract('governance');
       
       // Listen for proposal created events
       this.addEventListener('ProposalCreated', governanceContract, 'ProposalCreated', async (id, proposer, description, startBlock, endBlock) => {
@@ -194,7 +196,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
 
   private async setupRewardEventListeners() {
     try {
-      const rewardContract = this.contractService.getRewardContract();
+      const rewardContract = this.contractService.getContract('reward');
       
       // Listen for reward distributed events
       this.addEventListener('RewardDistributed', rewardContract, 'RewardDistributed', async (user, amount, timestamp) => {
@@ -215,7 +217,7 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
 
   private async setupStrategyEventListeners() {
     try {
-      const strategyContract = this.contractService.getStrategyContract();
+      const strategyContract = this.contractService.getContract('strategy');
       
       // Listen for strategy executed events
       this.addEventListener('StrategyExecuted', strategyContract, 'StrategyExecuted', async (strategyId, executor, result, timestamp) => {
@@ -253,12 +255,13 @@ export class EventListenerService implements OnModuleInit, OnModuleDestroy {
       this.removeEventListener(key);
       
       // Add the new listener
-      contract.on(eventName, async (...args) => {
+      contract.on(eventName, async (...args: any[]) => {
         try {
           await callback(...args);
-        } catch (error) {
+        } catch (error: unknown) {
+          const err = error as Error;
           const blockchainError = this.errorHandler.handleBlockchainError(
-            error, 
+            err, 
             `${eventName} event handler`
           );
           this.logger.error(`Error handling ${eventName} event: ${blockchainError.message}`);

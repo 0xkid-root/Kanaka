@@ -62,7 +62,7 @@ export class DefiController {
   async deposit(@Req() req: any, @Body() depositDto: DepositDto): Promise<Transaction> {
     return await this.defiService.deposit(
       req.user.id,
-      depositDto.poolId,
+      parseInt(depositDto.pool),
       depositDto.amount,
       req.user.walletAddress,
     );
@@ -79,7 +79,7 @@ export class DefiController {
   async withdraw(@Req() req: any, @Body() withdrawDto: WithdrawDto): Promise<Transaction> {
     return await this.defiService.withdraw(
       req.user.id,
-      withdrawDto.poolId,
+      parseInt(withdrawDto.pool),
       withdrawDto.amount,
       req.user.walletAddress,
     );

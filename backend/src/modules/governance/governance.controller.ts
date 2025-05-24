@@ -29,11 +29,12 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { 
-  CreateProposalDto, 
   ProposalDto, 
   CastVoteDto, 
   VoteResponseDto 
 } from '../../common/dtos/proposal.dto';
+import { CreateProposalDto } from './dto/create-proposal.dto';
+import { VoteDto } from './dto/vote.dto';
 
 @ApiTags('Governance')
 @Controller('governance')
@@ -200,7 +201,7 @@ export class GovernanceController {
     @Req() req: any
   ) {
     try {
-      return await this.governanceService.createProposal(dto, req.user.privateKey);
+      return await this.governanceService.createProposal(req.user.id, dto);
     } catch (error: any) {
       throw new HttpException(
         {
@@ -256,7 +257,7 @@ export class GovernanceController {
       }
       
       // Check if voting period is active
-      const now = Math.floor(Date.now() / 1000);
+      const now = new Date();
       if (now < proposal.startTime || now > proposal.endTime) {
         throw new HttpException(
           {
@@ -268,7 +269,16 @@ export class GovernanceController {
         );
       }
       
-      return await this.governanceService.castVote(id, dto.support, req.user.privateKey, dto.reason);
+      const voteDto: VoteDto = {
+        support: dto.support ? 'yes' : 'no',
+        walletAddress: req.user.walletAddress
+      };
+      
+      if (dto.reason) {
+        voteDto.reason = dto.reason;
+      }
+      
+      return await this.governanceService.vote(req.user.id, id, voteDto);
     } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
@@ -312,7 +322,7 @@ export class GovernanceController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized - Authentication required',
   })
-  async executeProposal(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+  async executeProposal(@Param('id', ParseIntPipe) id: number) {
     try {
       // First check if the proposal exists
       const proposal = await this.governanceService.getProposal(id);
@@ -328,7 +338,7 @@ export class GovernanceController {
       }
       
       // Check if proposal can be executed
-      if (proposal.executed) {
+      if (proposal.executedAt) {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
@@ -339,7 +349,7 @@ export class GovernanceController {
         );
       }
       
-      if (proposal.canceled) {
+      if (proposal.status === 'cancelled') {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
@@ -350,7 +360,7 @@ export class GovernanceController {
         );
       }
       
-      const now = Math.floor(Date.now() / 1000);
+      const now = new Date();
       if (now <= proposal.endTime) {
         throw new HttpException(
           {
@@ -362,7 +372,7 @@ export class GovernanceController {
         );
       }
       
-      return await this.governanceService.executeProposal(id, req.user.privateKey);
+      return await this.governanceService.executeProposal(id);
     } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;
@@ -406,7 +416,7 @@ export class GovernanceController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized - Authentication required',
   })
-  async cancelProposal(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+  async cancelProposal(@Param('id', ParseIntPipe) id: number) {
     try {
       // First check if the proposal exists
       const proposal = await this.governanceService.getProposal(id);
@@ -422,7 +432,7 @@ export class GovernanceController {
       }
       
       // Check if proposal can be canceled
-      if (proposal.executed) {
+      if (proposal.executedAt) {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
@@ -433,7 +443,7 @@ export class GovernanceController {
         );
       }
       
-      if (proposal.canceled) {
+      if (proposal.status === 'cancelled') {
         throw new HttpException(
           {
             status: HttpStatus.BAD_REQUEST,
@@ -444,7 +454,7 @@ export class GovernanceController {
         );
       }
       
-      return await this.governanceService.cancelProposal(id, req.user.privateKey);
+      return await this.governanceService.cancelProposal(id);
     } catch (error: any) {
       if (error instanceof HttpException) {
         throw error;

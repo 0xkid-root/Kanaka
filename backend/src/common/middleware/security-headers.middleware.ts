@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class SecurityHeadersMiddleware implements NestMiddleware {
-  use(req: Request, res: Response, next: NextFunction) {
+  use(_req: Request, res: Response, next: NextFunction) {
     // Protect against XSS attacks
     res.setHeader('X-XSS-Protection', '1; mode=block');
     

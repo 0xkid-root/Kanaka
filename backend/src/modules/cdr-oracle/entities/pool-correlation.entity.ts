@@ -3,17 +3,17 @@ import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } fro
 @Entity('pool_correlations')
 export class PoolCorrelation {
   @PrimaryColumn()
-  poolA: string;
+  poolA: string = '';
 
   @PrimaryColumn()
-  poolB: string;
+  poolB: string = '';
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  correlation: string;
+  correlation: string = '0';
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt: Date = new Date();
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt: Date = new Date();
 }

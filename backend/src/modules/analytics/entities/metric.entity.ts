@@ -1,25 +1,25 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('metrics')
 export class Metric {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number = 0;
 
   @Column()
-  poolId: number;
+  poolId: number = 0;
 
   @Column()
-  timestamp: Date;
+  timestamp: Date = new Date();
 
   @Column({ type: 'float' })
-  yield: number;
+  yield: number = 0;
 
   @Column({ type: 'float' })
-  volatility: number;
+  volatility: number = 0;
 
   @Column({ type: 'float' })
-  modeledYield: number;
+  modeledYield: number = 0;
 
   @Column({ type: 'float' })
-  score: number;
+  score: number = 0;
 }

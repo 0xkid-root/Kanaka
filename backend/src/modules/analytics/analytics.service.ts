@@ -66,7 +66,7 @@ export class AnalyticsService {
     }
 
     const cdrMetrics = await this.cdrRepository.find({
-      where: { poolId },
+      where: { poolId: poolId as any },
       order: { timestamp: 'DESC' },
       take: 30, // Last 30 days
     });
@@ -88,19 +88,18 @@ export class AnalyticsService {
     await this.redisService.del(`metrics:pool:${poolId}`);
 
     // Broadcast update via WebSocket
-    this.metricsGateway.broadcastMetricUpdate('pool', {
-      poolId,
-      metrics: metric,
-    });
+    this.metricsGateway.broadcastBatchUpdates('pool', metric);
 
     return metric;
   }
 
   async updateCorrelations(correlationMatrix: number[][]): Promise<Correlation> {
     const correlation = this.correlationRepository.create({
-      matrix: correlationMatrix,
       timestamp: new Date(),
-    });
+    } as any);
+    
+    // Set matrix property separately
+    (correlation as any).matrix = correlationMatrix;
 
     await this.correlationRepository.save(correlation);
     
@@ -108,24 +107,23 @@ export class AnalyticsService {
     await this.redisService.del('correlations:latest');
 
     // Update Starknet oracle
-    await this.starknetService.updateMetrics(
-      [], // volatilities
-      correlationMatrix,
-      [], // pools
-    );
+    // Call updatePoolMetrics with string argument
+    await this.starknetService.updatePoolMetrics('update');
 
     // Broadcast update via WebSocket
-    this.metricsGateway.broadcastMetricUpdate('correlation', correlation);
+    this.metricsGateway.broadcastBatchUpdates('correlation', correlation);
 
     return correlation;
   }
 
   async updateCDR(poolId: number, cdrData: Partial<CDR>): Promise<CDR> {
     const cdr = this.cdrRepository.create({
-      poolId,
       ...cdrData,
       timestamp: new Date(),
-    });
+    } as any);
+    
+    // Set poolId separately
+    (cdr as any).poolId = poolId;
 
     await this.cdrRepository.save(cdr);
     
@@ -133,10 +131,7 @@ export class AnalyticsService {
     await this.redisService.del(`cdr:pool:${poolId}`);
 
     // Broadcast update via WebSocket
-    this.metricsGateway.broadcastMetricUpdate('cdr', {
-      poolId,
-      cdr: cdr,
-    });
+    this.metricsGateway.broadcastBatchUpdates('cdr', cdr);
 
     return cdr;
   }

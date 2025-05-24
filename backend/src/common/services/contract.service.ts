@@ -14,19 +14,24 @@ export class ContractService {
   ) {
     this.provider = new Provider({
       sequencer: {
-        network: this.configService.get('STARKNET_NETWORK'),
+        network: this.configService.get('STARKNET_NETWORK') || 'goerli',
       },
     });
   }
 
   async getContract(name: string): Promise<Contract> {
     if (this.contracts.has(name)) {
-      return this.contracts.get(name);
+      return this.contracts.get(name)!;
     }
 
+    const address = this.configService.get(`${name.toUpperCase()}_ADDRESS`);
+    if (!address) {
+      throw new Error(`Contract address for ${name} not found in configuration`);
+    }
+    
     const contract = new Contract(
       require(`../abis/${name}.json`),
-      this.configService.get(`${name.toUpperCase()}_ADDRESS`),
+      address,
       this.provider,
     );
 
@@ -35,9 +40,14 @@ export class ContractService {
   }
 
   async getAccount(privateKey: string): Promise<Account> {
+    const accountAddress = this.configService.get('ACCOUNT_ADDRESS');
+    if (!accountAddress) {
+      throw new Error('Account address not found in configuration');
+    }
+    
     return new Account(
       this.provider,
-      this.configService.get('ACCOUNT_ADDRESS'),
+      accountAddress,
       privateKey,
     );
   }
@@ -77,7 +87,7 @@ export class ContractService {
     
     if (!account) {
       account = await this.getAccount(
-        this.configService.get('ADMIN_PRIVATE_KEY'),
+        this.configService.get('ADMIN_PRIVATE_KEY') || '',
       );
     }
 

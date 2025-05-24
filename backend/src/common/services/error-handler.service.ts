@@ -1,6 +1,5 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { AppLoggerService } from './logging.service';
-import { ethers } from 'ethers';
 
 /**
  * Error types for blockchain operations
@@ -50,8 +49,8 @@ export interface BlockchainError {
   code?: string;
   data?: any;
   originalError?: Error;
-  context?: string;
-  timestamp?: Date;
+  context: string;
+  timestamp: Date;
   transactionHash?: string;
   retryable: boolean;
   userFriendlyMessage?: string;

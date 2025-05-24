@@ -85,7 +85,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'API key generated successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async generateApiKey(
-    @Req() req,
+    @Req() req: any,
     @Body('name') name: string,
     @Body('expiresIn') expiresIn?: number,
   ) {
@@ -123,7 +123,7 @@ export class AuthController {
   @ApiOperation({ summary: 'List API keys' })
   @ApiResponse({ status: 200, description: 'API keys retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async listApiKeys(@Req() req) {
+  async listApiKeys(@Req() req: any) {
     return this.authService.listApiKeys(req.user.id);
   }
 
@@ -137,10 +137,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Get the current user' })
   @ApiResponse({ status: 200, description: 'User retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getMe(@Req() req) {
+  async getMe(@Req() req: any) {
     return {
       id: req.user.id,
-      address: req.user.address,
+      address: req.user.walletAddress,
       roles: req.user.roles,
     };
   }

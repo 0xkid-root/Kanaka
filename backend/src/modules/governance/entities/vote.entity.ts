@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Proposal } from './proposal.entity';
 
 @Entity('votes')
 export class Vote {
@@ -9,17 +10,21 @@ export class Vote {
   proposalId: number = 0;
 
   @Column()
-  voter: string = '';
-
-  @Column({ type: 'decimal', precision: 36, scale: 0 })
-  weight: string = '0';
+  voterId: number = 0;
 
   @Column()
-  vote: 'yes' | 'no' = 'yes';
+  voterAddress: string = '';
 
-  @Column({ type: 'text', nullable: true })
-  reason: string = '';
+  @Column({ type: 'decimal', precision: 36, scale: 0 })
+  power: string = '0';
+
+  @Column()
+  support: 'yes' | 'no' | 'abstain' = 'yes';
+
+  @ManyToOne(() => Proposal, proposal => proposal.votes)
+  @JoinColumn({ name: 'proposalId' })
+  proposal: Proposal = new Proposal();
 
   @CreateDateColumn()
-  timestamp: Date = new Date();
+  createdAt: Date = new Date();
 }

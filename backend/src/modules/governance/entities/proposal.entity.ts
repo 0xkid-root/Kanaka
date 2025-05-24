@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Vote } from './vote.entity';
 
 @Entity('proposals')
 export class Proposal {
@@ -12,28 +13,37 @@ export class Proposal {
   description: string = '';
 
   @Column()
-  proposer: string = '';
+  creatorId: number = 0;
 
-  @Column({ type: 'bigint' })
-  startTime: number = 0;
+  @Column()
+  creatorAddress: string = '';
 
-  @Column({ type: 'bigint' })
-  endTime: number = 0;
+  @Column('text')
+  actions: string = '[]';
 
-  @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  forVotes: string = '0';
+  @Column({ type: 'timestamp' })
+  startTime: Date = new Date();
 
-  @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  againstVotes: string = '0';
-
-  @Column({ default: false })
-  executed: boolean = false;
-
-  @Column({ default: false })
-  canceled: boolean = false;
+  @Column({ type: 'timestamp' })
+  endTime: Date = new Date();
 
   @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
-  quorum: string = '0';
+  yesVotes: string = '0';
+
+  @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
+  noVotes: string = '0';
+
+  @Column({ type: 'decimal', precision: 36, scale: 0, default: '0' })
+  abstainVotes: string = '0';
+
+  @Column({ default: 'active' })
+  status: string = 'active';
+
+  @Column({ type: 'timestamp', nullable: true })
+  executedAt: Date | null = null;
+
+  @OneToMany(() => Vote, vote => vote.proposal)
+  votes: Vote[] = [];
 
   @CreateDateColumn()
   createdAt: Date = new Date();
