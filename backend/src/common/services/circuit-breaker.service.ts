@@ -55,7 +55,7 @@ export class CircuitBreakerService {
   }> = new Map();
 
   constructor(
-    private redisService: RedisService,
+    private redisService: RedisService, // Keep for potential future use
     loggerService: AppLoggerService,
   ) {
     this.logger = loggerService.createLogger(CircuitBreakerService.name);
@@ -82,7 +82,7 @@ export class CircuitBreakerService {
       });
     }
     
-    const circuit = this.circuits.get(circuitName);
+    const circuit = this.circuits.get(circuitName)!; // Non-null assertion since we ensure it exists above
     
     // Check if circuit is open
     if (circuit.state === CircuitState.OPEN) {
@@ -120,7 +120,7 @@ export class CircuitBreakerService {
       }
       
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       // Check if this error type should count as a failure
       const isFailureType = 
         opts.failureTypes.length === 0 || 
@@ -130,7 +130,8 @@ export class CircuitBreakerService {
         circuit.failures++;
         circuit.lastFailure = Date.now();
         
-        this.logger.warn(`Circuit ${circuitName} recorded failure ${circuit.failures}/${opts.failureThreshold}: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.warn(`Circuit ${circuitName} recorded failure ${circuit.failures}/${opts.failureThreshold}: ${errorMessage}`);
         
         // Check if we should open the circuit
         if (circuit.failures >= opts.failureThreshold) {

@@ -386,8 +386,7 @@ export class GovernanceService {
    * @param reason Optional reason for the vote
    * @returns The created vote
    */
-  // This method is not used - we use vote() instead
-  private async castVote(proposalId: number, support: boolean, walletAddress: string, reason?: string): Promise<Vote> {
+  private async castVote(proposalId: number, support: boolean, walletAddress: string): Promise<Vote> {
     // Get proposal
     const proposal = await this.getProposal(proposalId);
     

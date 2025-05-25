@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Connection } from 'typeorm';
 import { User } from '../../modules/user/entities/user.entity';
 import * as os from 'os';
+import * as diskusage from 'diskusage';
 
 interface HealthStatus {
   status: 'ok' | 'error' | 'degraded';
@@ -179,7 +180,7 @@ export class HealthService {
     try {
       this.logger.debug('Checking blockchain connection');
       
-      const provider = this.contractService.getProvider();
+      const provider = await this.contractService.getProvider(); // Assume getProvider returns Promise<ethers.providers.Provider>
       
       // Get current block number with timing
       const startTime = Date.now();
@@ -238,20 +239,50 @@ export class HealthService {
         latency,
         syncing,
       };
-    } catch (error) {
-      this.logger.error(`Blockchain health check failed: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Blockchain health check failed: ${errorMessage}`, errorStack);
       return { 
         status: 'error', 
-        message: `Blockchain connection error: ${error.message}` 
+        message: `Blockchain connection error: ${errorMessage}` 
+      };
+    }
+  }
+
+  private async checkRedis(): Promise<{
+    status: 'ok' | 'error';
+    message?: string;
+    latency?: number;
+  }> {
+    try {
+      this.logger.debug('Checking Redis connection');
+      
+      // Perform a simple ping with timing
+      const startTime = Date.now();
+      await this.redisService.ping();
+      const latency = Date.now() - startTime;
+      
+      return {
+        status: 'ok',
+        latency,
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Redis health check failed: ${errorMessage}`);
+      return {
+        status: 'error',
+        message: `Redis connection error: ${errorMessage}`,
       };
     }
   }
 
   private async checkMemory(): Promise<{ 
-    status: 'ok' | 'error'; 
+    status: 'ok' | 'error' | 'warning'; 
     used: number;
     total: number;
     percentUsed: number;
+    rss?: number;
   }> {
     try {
       this.logger.debug('Checking memory usage');
@@ -260,21 +291,99 @@ export class HealthService {
       const used = Math.round(memoryUsage.heapUsed / 1024 / 1024);
       const total = Math.round(memoryUsage.heapTotal / 1024 / 1024);
       const percentUsed = Math.round((used / total) * 100);
+      const rss = Math.round(memoryUsage.rss / 1024 / 1024);
       
-      // Consider memory usage critical if it's above 90%
-      const status = percentUsed > 90 ? 'error' : 'ok';
+      // Consider memory usage warning if above 80%, critical if above 90%
+      const status = percentUsed > 90 ? 'error' : percentUsed > 80 ? 'warning' : 'ok';
       
       return { 
         status,
         used,
         total,
         percentUsed,
+        rss,
       };
-    } catch (error) {
-      this.logger.error(`Memory health check failed: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Memory health check failed: ${errorMessage}`, errorStack);
       return { 
         status: 'error', 
         used: 0,
+        total: 0,
+        percentUsed: 0,
+      };
+    }
+  }
+
+  private async checkCpu(): Promise<{
+    status: 'ok' | 'error' | 'warning';
+    usage: number;
+    cores: number;
+    load: number[];
+  }> {
+    try {
+      this.logger.debug('Checking CPU usage');
+      
+      const cores = os.cpus().length;
+      const load = os.loadavg(); // 1, 5, 15 minute load averages
+      
+      // Calculate average CPU usage (approximation)
+      const usage = Math.round((load[0] / cores) * 100);
+      
+      // Consider CPU usage warning if above 80%, critical if above 90%
+      const status = usage > 90 ? 'error' : usage > 80 ? 'warning' : 'ok';
+      
+      return {
+        status,
+        usage,
+        cores,
+        load,
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`CPU health check failed: ${errorMessage}`, errorStack);
+      return {
+        status: 'error',
+        usage: 0,
+        cores: 0,
+        load: [0, 0, 0],
+      };
+    }
+  }
+
+  private async checkDisk(): Promise<{
+    status: 'ok' | 'error' | 'warning';
+    free: number;
+    total: number;
+    percentUsed: number;
+  }> {
+    try {
+      this.logger.debug('Checking disk usage');
+      
+      // Check disk usage for the root path (or adjust to specific path)
+      const diskInfo = await diskusage.check('/');
+      const free = Math.round(diskInfo.free / 1024 / 1024); // MB
+      const total = Math.round(diskInfo.total / 1024 / 1024); // MB
+      const percentUsed = Math.round(((total - free) / total) * 100);
+      
+      // Consider disk usage warning if above 80%, critical if above 90%
+      const status = percentUsed > 90 ? 'error' : percentUsed > 80 ? 'warning' : 'ok';
+      
+      return {
+        status,
+        free,
+        total,
+        percentUsed,
+      };
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Disk health check failed: ${errorMessage}`, errorStack);
+      return {
+        status: 'error',
+        free: 0,
         total: 0,
         percentUsed: 0,
       };

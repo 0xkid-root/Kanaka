@@ -13,7 +13,7 @@ import { SensitiveDataFilter } from '../filters/sensitive-data.filter';
 
 @Injectable()
 export class CustomValidationPipe implements PipeTransform<any> {
-  private readonly logger: AppLoggerService;
+  private readonly logger!: AppLoggerService;
   private readonly options: ValidationPipeOptions;
 
   constructor(
@@ -28,7 +28,7 @@ export class CustomValidationPipe implements PipeTransform<any> {
       forbidUnknownValues: true,
       ...options,
     };
-    
+
     if (loggerService) {
       this.logger = loggerService.createLogger(CustomValidationPipe.name);
     }
@@ -39,15 +39,15 @@ export class CustomValidationPipe implements PipeTransform<any> {
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
-    
-    // Skip validation for empty values if not required
+
+    // Skip validation for undefined values if not required
     if (value === undefined && !this.options.validateCustomDecorators) {
       return value;
     }
-    
+
     // Transform plain objects to class instances
     const object = plainToInstance(metatype, value);
-    
+
     // Validate the object
     const errors = await validate(object, {
       whitelist: this.options.whitelist,
@@ -55,32 +55,32 @@ export class CustomValidationPipe implements PipeTransform<any> {
       forbidUnknownValues: this.options.forbidUnknownValues,
       skipMissingProperties: this.options.skipMissingProperties,
     });
-    
+
     // If there are validation errors, throw a BadRequestException
     if (errors.length > 0) {
       const formattedErrors = this.formatErrors(errors);
-      
+
       // Log the validation error (with sensitive data filtered)
       if (this.logger) {
-        const filteredValue = this.sensitiveDataFilter 
+        const filteredValue = this.sensitiveDataFilter
           ? this.sensitiveDataFilter.filterObject(value)
           : value;
-          
-        this.logger.debug(`Validation failed for ${metatype.name}: ${JSON.stringify({
+
+        this.logger.debug(`Validation failed for ${metatype?.name ?? 'UnknownType'}: ${JSON.stringify({
           value: filteredValue,
           errors: formattedErrors,
           type,
           data,
         })}`);
       }
-      
+
       throw new BadRequestException({
         message: 'Validation failed',
         error: 'Bad Request',
         details: formattedErrors,
       });
     }
-    
+
     // Return the transformed object if transform is enabled
     return this.options.transform ? object : value;
   }
@@ -92,21 +92,22 @@ export class CustomValidationPipe implements PipeTransform<any> {
 
   private formatErrors(errors: ValidationError[]): Record<string, string> {
     return errors.reduce((acc: Record<string, string>, error) => {
+      const property = error.property ?? 'unknown';
       const constraints = error.constraints || {};
       const messages = Object.values(constraints);
-      
+
       if (messages.length) {
-        acc[error.property] = messages[0];
+        acc[property] = messages[0];
       }
-      
+
       if (error.children && error.children.length) {
         const childErrors = this.formatErrors(error.children);
         Object.keys(childErrors).forEach(key => {
-          acc[`${error.property}.${key}`] = childErrors[key];
+          acc[`${property}.${key}`] = childErrors[key];
         });
       }
-      
+
       return acc;
-    }, {} as Record<string, string>);
+    }, {});
   }
 }

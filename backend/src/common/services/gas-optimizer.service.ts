@@ -37,7 +37,7 @@ export interface GasOptimizationOptions {
   customMaxFeePerGas?: string;
   customMaxPriorityFeePerGas?: string;
   multiplier?: number;
-  forceEIP1559?: boolean;
+  forceEIP1559?: boolean;
   forceLegacy?: boolean;
 }
 
@@ -124,34 +124,50 @@ export class GasOptimizerService {
     if (multiplier !== 1) {
       if (selectedGasPrice.type === 2) {
         // EIP-1559 transaction
-        selectedGasPrice.maxFeePerGas = this.applyMultiplier(selectedGasPrice.maxFeePerGas, multiplier);
-        selectedGasPrice.maxPriorityFeePerGas = this.applyMultiplier(selectedGasPrice.maxPriorityFeePerGas, multiplier);
+        if (selectedGasPrice.maxFeePerGas && selectedGasPrice.maxPriorityFeePerGas) {
+          selectedGasPrice.maxFeePerGas = this.applyMultiplier(selectedGasPrice.maxFeePerGas, multiplier);
+          selectedGasPrice.maxPriorityFeePerGas = this.applyMultiplier(selectedGasPrice.maxPriorityFeePerGas, multiplier);
+        } else {
+          throw new Error('Missing maxFeePerGas or maxPriorityFeePerGas for EIP-1559 transaction');
+        }
       } else {
         // Legacy transaction
-        selectedGasPrice.gasPrice = this.applyMultiplier(selectedGasPrice.gasPrice, multiplier);
+        if (selectedGasPrice.gasPrice) {
+          selectedGasPrice.gasPrice = this.applyMultiplier(selectedGasPrice.gasPrice, multiplier);
+        } else {
+          throw new Error('Missing gasPrice for legacy transaction');
+        }
       }
     }
     
     // Force EIP-1559 or legacy if requested
     if (options.forceEIP1559 && selectedGasPrice.type === 0) {
       // Convert legacy to EIP-1559
-      const gasPrice = ethers.BigNumber.from(selectedGasPrice.gasPrice);
-      const baseFee = await this.getBaseFeePerGas();
-      
-      selectedGasPrice.maxFeePerGas = gasPrice.toString();
-      selectedGasPrice.maxPriorityFeePerGas = gasPrice.sub(baseFee).toString();
-      selectedGasPrice.baseFeePerGas = baseFee.toString();
-      selectedGasPrice.type = 2;
-      delete selectedGasPrice.gasPrice;
+      if (selectedGasPrice.gasPrice) {
+        const gasPrice = ethers.BigNumber.from(selectedGasPrice.gasPrice);
+        const baseFee = await this.getBaseFeePerGas();
+        
+        selectedGasPrice.maxFeePerGas = gasPrice.toString();
+        selectedGasPrice.maxPriorityFeePerGas = gasPrice.sub(baseFee).toString();
+        selectedGasPrice.baseFeePerGas = baseFee.toString();
+        selectedGasPrice.type = 2;
+        delete selectedGasPrice.gasPrice;
+      } else {
+        throw new Error('Missing gasPrice for conversion to EIP-1559');
+      }
     } else if (options.forceLegacy && selectedGasPrice.type === 2) {
       // Convert EIP-1559 to legacy
-      const maxFeePerGas = ethers.BigNumber.from(selectedGasPrice.maxFeePerGas);
-      
-      selectedGasPrice.gasPrice = maxFeePerGas.toString();
-      selectedGasPrice.type = 0;
-      delete selectedGasPrice.maxFeePerGas;
-      delete selectedGasPrice.maxPriorityFeePerGas;
-      delete selectedGasPrice.baseFeePerGas;
+      if (selectedGasPrice.maxFeePerGas) {
+        const maxFeePerGas = ethers.BigNumber.from(selectedGasPrice.maxFeePerGas);
+        
+        selectedGasPrice.gasPrice = maxFeePerGas.toString();
+        selectedGasPrice.type = 0;
+        delete selectedGasPrice.maxFeePerGas;
+        delete selectedGasPrice.maxPriorityFeePerGas;
+        delete selectedGasPrice.baseFeePerGas;
+      } else {
+        throw new Error('Missing maxFeePerGas for conversion to legacy');
+      }
     }
     
     return selectedGasPrice;
@@ -170,7 +186,7 @@ export class GasOptimizerService {
     }
     
     try {
-      const provider = this.contractService.getProvider();
+      const provider = await this.contractService.getProvider(); // Assume getProvider returns Promise<ethers.providers.Provider>
       const result: GasPriceData[] = [];
       
       // Try to get fee data (EIP-1559)
@@ -233,8 +249,9 @@ export class GasOptimizerService {
           
           return result;
         }
-      } catch (error) {
-        this.logger.debug(`EIP-1559 fee data not available: ${error.message}`);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.debug(`EIP-1559 fee data not available: ${errorMessage}`);
       }
       
       // Fall back to legacy gas price
@@ -281,8 +298,10 @@ export class GasOptimizerService {
       this.gasPriceCache.timestamp = now;
       
       return result;
-    } catch (error) {
-      this.logger.error(`Error getting gas price data: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Error getting gas price data: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -293,7 +312,7 @@ export class GasOptimizerService {
    */
   async getBaseFeePerGas(): Promise<ethers.BigNumber> {
     try {
-      const provider = this.contractService.getProvider();
+      const provider = await this.contractService.getProvider(); // Assume getProvider returns Promise<ethers.providers.Provider>
       
       // Get the latest block
       const block = await provider.getBlock('latest');
@@ -305,8 +324,10 @@ export class GasOptimizerService {
       // If the block doesn't have a base fee, estimate it from the gas price
       const gasPrice = await provider.getGasPrice();
       return gasPrice.div(2); // Rough estimate
-    } catch (error) {
-      this.logger.error(`Error getting base fee per gas: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Error getting base fee per gas: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -345,7 +366,7 @@ export class GasOptimizerService {
       }
       
       // No history, estimate gas from contract
-      const contract = this.contractService.getContract(contractName);
+      const contract = await this.contractService.getContract(contractName); // Await the Promise
       const gasEstimate = await contract.estimateGas[methodName](...args);
       
       // Apply multiplier for safety
@@ -354,8 +375,10 @@ export class GasOptimizerService {
       this.logger.debug(`Estimated gas for ${key}: ${estimatedGas}`);
       
       return estimatedGas.toString();
-    } catch (error) {
-      this.logger.error(`Error estimating gas: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Error estimating gas: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -397,8 +420,10 @@ export class GasOptimizerService {
       this.gasUsageHistory.set(key, history);
       
       this.logger.debug(`Recorded gas usage for ${key}: ${gasUsed}`);
-    } catch (error) {
-      this.logger.error(`Error recording gas usage: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Error recording gas usage: ${errorMessage}`, errorStack);
     }
   }
 
@@ -433,10 +458,10 @@ export class GasOptimizerService {
     }
     
     const gasValues = history.map(entry => entry.gasUsed).sort((a, b) => a - b);
-    const min = gasValues[0];
-    const max = gasValues[gasValues.length - 1];
+    const min = gasValues[0] ?? 0; // Fallback to 0 if undefined
+    const max = gasValues[gasValues.length - 1] ?? 0; // Fallback to 0 if undefined
     const avg = Math.ceil(gasValues.reduce((sum, val) => sum + val, 0) / gasValues.length);
-    const median = gasValues[Math.floor(gasValues.length / 2)];
+    const median = gasValues[Math.floor(gasValues.length / 2)] ?? 0; // Fallback to 0 if undefined
     
     return { min, max, avg, median, count: history.length };
   }

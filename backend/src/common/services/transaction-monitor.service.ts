@@ -7,6 +7,7 @@ import { ContractService } from './contract.service';
 import { AppLoggerService } from './logging.service';
 import { Transaction } from '../entities/transaction.entity';
 import { TransactionStatus } from '../enums/transaction-status.enum';
+import { ethers } from 'ethers';
 
 @Injectable()
 export class TransactionMonitorService implements OnModuleInit {
@@ -15,7 +16,7 @@ export class TransactionMonitorService implements OnModuleInit {
   private readonly maxConfirmations: number;
   private readonly maxRetries: number;
   private monitoringActive = false;
-  private monitoringTimer: NodeJS.Timeout;
+  private monitoringTimer: NodeJS.Timeout | undefined; // Initialize as undefined
 
   constructor(
     @InjectRepository(Transaction)
@@ -36,8 +37,10 @@ export class TransactionMonitorService implements OnModuleInit {
       this.logger.log('Initializing transaction monitoring service');
       await this.startMonitoring();
       this.logger.log('Transaction monitoring service initialized successfully');
-    } catch (error) {
-      this.logger.error(`Failed to initialize transaction monitoring service: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to initialize transaction monitoring service: ${errorMessage}`, errorStack);
     }
   }
 
@@ -57,8 +60,10 @@ export class TransactionMonitorService implements OnModuleInit {
     this.monitoringTimer = setInterval(async () => {
       try {
         await this.checkPendingTransactions();
-      } catch (error) {
-        this.logger.error(`Error in transaction monitoring: ${error.message}`, error.stack);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorStack = error instanceof Error ? error.stack : undefined;
+        this.logger.error(`Error in transaction monitoring: ${errorMessage}`, errorStack);
       }
     }, this.monitorInterval);
   }
@@ -69,7 +74,10 @@ export class TransactionMonitorService implements OnModuleInit {
     }
 
     this.logger.log('Stopping transaction monitoring');
-    clearInterval(this.monitoringTimer);
+    if (this.monitoringTimer) {
+      clearInterval(this.monitoringTimer);
+      this.monitoringTimer = undefined;
+    }
     this.monitoringActive = false;
   }
 
@@ -105,8 +113,10 @@ export class TransactionMonitorService implements OnModuleInit {
       this.eventEmitter.emit('transaction.new', transaction);
       
       return transaction;
-    } catch (error) {
-      this.logger.error(`Failed to track transaction ${hash}: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to track transaction ${hash}: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -129,8 +139,10 @@ export class TransactionMonitorService implements OnModuleInit {
       for (const transaction of pendingTransactions) {
         await this.updateTransactionStatus(transaction);
       }
-    } catch (error) {
-      this.logger.error(`Failed to check pending transactions: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to check pending transactions: ${errorMessage}`, errorStack);
       throw error;
     }
   }
@@ -185,14 +197,16 @@ export class TransactionMonitorService implements OnModuleInit {
       // Save updated transaction
       transaction.updatedAt = new Date();
       await this.transactionRepository.save(transaction);
-    } catch (error) {
-      this.logger.error(`Failed to update transaction ${transaction.hash}: ${error.message}`, error.stack);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      this.logger.error(`Failed to update transaction ${transaction.hash}: ${errorMessage}`, errorStack);
       
       // Mark as failed after too many errors
       transaction.retryCount = (transaction.retryCount || 0) + 1;
       if (transaction.retryCount > this.maxRetries) {
         transaction.status = TransactionStatus.FAILED;
-        transaction.error = `Error updating status: ${error.message}`;
+        transaction.error = `Error updating status: ${errorMessage}`;
         this.eventEmitter.emit('transaction.failed', transaction);
       }
       
